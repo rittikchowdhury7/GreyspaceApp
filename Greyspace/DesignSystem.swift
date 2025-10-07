@@ -2,16 +2,16 @@ import SwiftUI
 
 enum DS {
     enum Color {
-        static let primary = Color("Primary")
-        static let onPrimary = Color("OnPrimary")
-        static let background = Color("Background")
-        static let surface = Color("Surface")
-        static let onSurface = Color("OnSurface")
-        static let muted = Color("Muted")
-        static let accent = Color("Accent")
-        static let danger = Color("Danger")
-        static let success = Color("Success")
-        static let warning = Color("Warning")
+        static let primary = SwiftUI.Color("Primary")
+        static let onPrimary = SwiftUI.Color("OnPrimary")
+        static let background = SwiftUI.Color("Background")
+        static let surface = SwiftUI.Color("Surface")
+        static let onSurface = SwiftUI.Color("OnSurface")
+        static let muted = SwiftUI.Color("Muted")
+        static let accent = SwiftUI.Color("Accent")
+        static let danger = SwiftUI.Color("Danger")
+        static let success = SwiftUI.Color("Success")
+        static let warning = SwiftUI.Color("Warning")
     }
 
     enum Spacing {
