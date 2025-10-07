@@ -13,6 +13,7 @@ struct GreyspaceApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .appTheme()
         }
         .modelContainer(for: [JournalEntry.self, ThoughtRecord.self, PressureSlip.self])
     }

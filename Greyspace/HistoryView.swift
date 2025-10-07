@@ -31,7 +31,7 @@ struct HistoryView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
-                .padding(.top, 8)
+                .padding(.top, DS.Spacing.sm)
                 .onChange(of: kind) { if $0 == .reframes { query = "" } }
 
                 if kind == .entries {
@@ -43,7 +43,7 @@ struct HistoryView: View {
                 } else {
                     // Reframes grid (no extra List or searchable here)
                     ReframeLibraryView(embedded: true)
-                        .padding(.top, 8)
+                        .padding(.top, DS.Spacing.sm)
                 }
             }
             .navigationTitle("History")
@@ -58,7 +58,7 @@ struct HistoryView: View {
                 if filteredEntries.isEmpty {
                     EmptyStateView(title: "No entries yet",
                                    subtitle: "Log a quick check-in on the Today tab.")
-                        .padding(.top, 24)
+                        .padding(.top, DS.Spacing.xl)
                 } else {
                     ForEach(filteredEntries) { e in
                         JournalPost(entry: e)
@@ -75,9 +75,9 @@ struct HistoryView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 24)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.top, DS.Spacing.md)
+            .padding(.bottom, DS.Spacing.xl)
         }
     }
 
@@ -110,11 +110,11 @@ private struct EmptyStateView: View {
     let subtitle: String
     var body: some View {
         VStack(spacing: 6) {
-            Text(title).font(.headline)
-            Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
+            Text(title).font(DS.Typography.heading())
+            Text(subtitle).font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.vertical, DS.Spacing.xl)
     }
 }
 

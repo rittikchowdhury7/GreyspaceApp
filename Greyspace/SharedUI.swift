@@ -14,10 +14,10 @@ struct StepHeader: View {
     let total: Int
 
     var body: some View {
-        VStack(spacing: 8) {
-            Text(title).font(.headline)
+        VStack(spacing: DS.Spacing.sm) {
+            Text(title).font(DS.Typography.heading())
             ProgressView(value: Double(step), total: Double(total))
-                .tint(.primary)
+                .tint(DS.Color.primary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -39,10 +39,10 @@ struct WizardControls: View {
             }
             Spacer()
             if showSkip {
-                Button("Skip", action: onSkip).foregroundStyle(.secondary)
+                Button("Skip", action: onSkip).foregroundStyle(DS.Color.muted)
             }
             Button(nextTitle, action: onNext)
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(PrimaryButtonStyle())
         }
     }
 }
@@ -53,9 +53,9 @@ struct SummaryRow: View {
     let value: String
     var body: some View {
         HStack {
-            Text(label).font(.subheadline).foregroundStyle(.secondary)
+            Text(label).font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
             Spacer()
-            Text(value).font(.subheadline)
+            Text(value).font(DS.Typography.body())
         }
     }
 }
@@ -103,7 +103,7 @@ struct FlowLayout<Data: RandomAccessCollection, ID: Hashable, Content: View>: Vi
         return ZStack(alignment: .topLeading) {
             ForEach(Array(items), id: id) { item in
                 content(item)
-                    .padding(4)
+                    .padding(DS.Spacing.xs)
                     .alignmentGuide(.leading) { d in
                         if (width + d.width) > g.size.width {
                             width = 0

@@ -15,33 +15,33 @@ struct PolaroidThumbCard: View {
     let date: Date
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             // Header
-            HStack(spacing: 8) {
+            HStack(spacing: DS.Spacing.sm) {
                 Text(title)
-                    .font(.caption).fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption()).fontWeight(.semibold)
+                    .foregroundStyle(DS.Color.muted)
                 Spacer()
                 Text(date, style: .date)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption())
+                    .foregroundStyle(DS.Color.muted)
             }
 
             // Card content (this drives the layout height)
             VStack(alignment: .leading, spacing: 10) {
                 Text("Original")
-                    .font(.caption2).fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption()).fontWeight(.semibold)
+                    .foregroundStyle(DS.Color.muted)
                 Text("“\(original)”")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption())
+                    .foregroundStyle(DS.Color.muted)
                     .lineLimit(2)
 
                 Divider().opacity(0.25)
 
                 Text("Softer thought")
-                    .font(.caption2).fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption()).fontWeight(.semibold)
+                    .foregroundStyle(DS.Color.muted)
 
                 // Reframe callout (border sits on the container, not on Text)
                 VStack(alignment: .leading, spacing: 0) {
@@ -50,27 +50,27 @@ struct PolaroidThumbCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .textSelection(.disabled)
                 }
-                .padding(8)
+                .padding(DS.Spacing.sm)
                 .background(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: DS.Radius.sm)
                         .fill(Color.clear)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.accentColor.opacity(0.25), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: DS.Radius.sm)
+                        .stroke(DS.Color.accent.opacity(0.25), lineWidth: 1)
                 )
             }
-            .padding(14)
+            .padding(DS.Spacing.md)
             .background(                // ✅ background uses the content’s size
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(UIColor.secondarySystemBackground))
+                RoundedRectangle(cornerRadius: DS.Radius.lg)
+                    .fill(DS.Color.surface)
             )
             .overlay(                   // fine to add a thin border as overlay
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color(UIColor.separator), lineWidth: 1)
+                RoundedRectangle(cornerRadius: DS.Radius.lg)
+                    .stroke(DS.Color.muted.opacity(0.3), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 8)
         }
-        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
     }
 }

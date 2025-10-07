@@ -54,13 +54,13 @@ struct SettingsView: View {
                     }
 
                     Toggle("Haptics", isOn: $hapticsEnabled)
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                         Toggle("Share anonymous usage", isOn: $analyticsOptIn)
-                            .tint(.accentColor)
+                            .tint(DS.Color.accent)
 
                         Text("Helps improve Greyspace; never includes your notes or photos.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(DS.Typography.caption())
+                            .foregroundStyle(DS.Color.muted)
                     }
                 }
 
@@ -125,7 +125,7 @@ struct SettingsView: View {
                         Text("Version")
                         Spacer()
                         Text(appVersionString())
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DS.Color.muted)
                     }
                     Button {
                         // Replace with your App Store URL
@@ -141,6 +141,9 @@ struct SettingsView: View {
                     }
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(DS.Color.background)
             .navigationTitle("Settings")
             .confirmationDialog(
                 "Delete all local data?",

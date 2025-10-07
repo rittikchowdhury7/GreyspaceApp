@@ -19,10 +19,10 @@ struct PolaroidMomentView: View {
 
     var body: some View {
         ZStack {
-            Color(UIColor.systemGroupedBackground).ignoresSafeArea()
-            VStack(spacing: 16) {
+            DS.Color.background.ignoresSafeArea()
+            VStack(spacing: DS.Spacing.lg) {
                 Text("Greyspace Moment")
-                    .font(.headline)
+                    .font(DS.Typography.heading())
 
                 PolaroidCard(
                     original: originalThought,
@@ -33,29 +33,29 @@ struct PolaroidMomentView: View {
                 )
                 .frame(height: 320)
 
-                HStack(spacing: 8) {
+                HStack(spacing: DS.Spacing.sm) {
                     if !hasFlippedOnce {
                         Image(systemName: "hand.point.up.left.fill")
                             .imageScale(.medium)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DS.Color.muted)
                         Text("Tap the card to reveal your softer thought")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(DS.Typography.caption())
+                            .foregroundStyle(DS.Color.muted)
                     } else {
                         Image(systemName: "checkmark.seal.fill")
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(DS.Color.accent)
                         Text("Saved to your Reframe Library")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(DS.Typography.caption())
+                            .foregroundStyle(DS.Color.muted)
                     }
                 }
-                .padding(.top, 4)
+                .padding(.top, DS.Spacing.xs)
 
                 Button("Done") { onDone() }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.top, 4)
+                    .buttonStyle(PrimaryButtonStyle())
+                    .padding(.top, DS.Spacing.xs)
             }
-            .padding(16)
+            .padding(DS.Spacing.lg)
         }
     }
 }
@@ -86,7 +86,7 @@ struct PolaroidCard: View {
             }
         }
         .animation(.spring(response: 0.55, dampingFraction: 0.8), value: flipped)
-        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
         .onTapGesture {
             let first = !flipped
             withAnimation {
@@ -112,11 +112,11 @@ struct PolaroidCard: View {
                     Text("Tap to flip")
                 }
                 .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .foregroundStyle(DS.Color.muted)
+                .padding(.horizontal, DS.Spacing.md)
+                .padding(.vertical, DS.Spacing.sm)
                 .background(.ultraThinMaterial, in: Capsule())
-                .padding(10)
+                .padding(DS.Spacing.md)
                 .transition(.opacity)
             }
         }
@@ -128,27 +128,27 @@ struct PolaroidCard: View {
     private var faceFront: some View {
         PolaroidFace {
             Text("Original thought")
-                .font(.caption).fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).fontWeight(.semibold)
+                .foregroundStyle(DS.Color.muted)
             Text("“\(original)”")
-                .font(.title3)
-                .foregroundStyle(.primary)
+                .font(DS.Typography.heading())
+                .foregroundStyle(DS.Color.onSurface)
             Text("Let’s soften it…")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(DS.Typography.caption())
+                .foregroundStyle(DS.Color.muted)
         }
     }
 
     private var faceBack: some View {
         PolaroidFace {
             Text("Softer thought")
-                .font(.caption).fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).fontWeight(.semibold)
+                .foregroundStyle(DS.Color.muted)
             Text("“\(reframe)”")
                 .font(.title3.weight(.semibold))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.accentColor.opacity(glow ? 0.45 : 0.2), lineWidth: glow ? 2 : 1)
+                    RoundedRectangle(cornerRadius: DS.Radius.sm)
+                        .stroke(DS.Color.accent.opacity(glow ? 0.45 : 0.2), lineWidth: glow ? 2 : 1)
                         .blur(radius: glow ? 1.5 : 0)
                 )
                 .accessibilityLabel("Reframed thought: \(reframe)")
@@ -160,18 +160,18 @@ struct PolaroidCard: View {
 private struct PolaroidFace<Content: View>: View {
     @ViewBuilder var content: Content
     var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color(UIColor.secondarySystemBackground))
+        RoundedRectangle(cornerRadius: DS.Radius.lg)
+            .fill(DS.Color.surface)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color(UIColor.separator), lineWidth: 1)
+                RoundedRectangle(cornerRadius: DS.Radius.lg)
+                    .stroke(DS.Color.muted.opacity(0.3), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: 10)
             .overlay(
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                     content
                 }
-                .padding(16)
+                .padding(DS.Spacing.lg)
             )
     }
 }

@@ -84,14 +84,14 @@ struct ThoughtBuilderWizard: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: DS.Spacing.lg) {
                 StepHeader2(title: "Thought Builder", step: step, total: totalSteps)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.xl) {
                         currentStepView
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
                     .padding(.bottom, 120)
                 }
 
@@ -166,19 +166,19 @@ struct ThoughtBuilderWizard: View {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Try a softer reframe").font(.title3).bold()
+                Text("Try a softer reframe").font(DS.Typography.heading()).bold()
                 Text("You’re not fixing your thought—just softening it.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
 
                 if suggestions.isEmpty && aiSuggestions.isEmpty && !aiLoading {
                     Text("We’ll suggest options once you’ve added a thought and a feeling.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                 }
 
                 // Non-AI suggestions
                 if !suggestions.isEmpty {
                     Text("Suggestions")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                        .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
                     ReframeSuggestionsList(
                         items: suggestions.map { SuggestionItem(text: $0, isAI: false) },
                         chosenReframe: $chosenReframe,
@@ -188,15 +188,15 @@ struct ThoughtBuilderWizard: View {
 
                 // AI suggestions + badge + optional typewriter
                 if aiLoading {
-                    HStack(spacing: 8) {
+                    HStack(spacing: DS.Spacing.sm) {
                         ProgressView().progressViewStyle(.circular)
                         Text("Getting ideas…")
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, DS.Spacing.xs)
                 } else if !aiSuggestions.isEmpty {
                     HStack(spacing: 6) {
                         Text("Suggestions from AI")
-                            .font(.subheadline).foregroundStyle(.secondary)
+                            .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
                         AIBadge()
                     }
                     ReframeSuggestionsList(
@@ -205,13 +205,13 @@ struct ThoughtBuilderWizard: View {
                         animateAIText: animateAIText   // ← only true right after fetch
                     )
                     Text("Tips are AI-generated. Pick what fits you.")
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                 }
 
                 HStack {
                     Button(action: onMoreIdeas) {
                         if aiLoading {
-                            HStack(spacing: 8) {
+                            HStack(spacing: DS.Spacing.sm) {
                                 ProgressView()
                                 Text("Getting ideas…")
                             }
@@ -219,7 +219,7 @@ struct ThoughtBuilderWizard: View {
                             Label("More ideas", systemImage: "sparkles")
                         }
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(SecondaryButtonStyle())
                     .disabled(aiLoading)
 
                     Spacer()
@@ -238,55 +238,55 @@ struct ThoughtBuilderWizard: View {
         }
     }
     private var captureThoughtStep: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("What’s on your mind?").font(.title3).bold()
-            Text("Anything is okay to write. This is just for you.").font(.footnote).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            Text("What’s on your mind?").font(DS.Typography.heading()).bold()
+            Text("Anything is okay to write. This is just for you.").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
             TextEditor(text: $rawThought)
                 .frame(minHeight: 140)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(.quaternary))
-                .padding(.top, 4)
+                .overlay(RoundedRectangle(cornerRadius: DS.Radius.md).stroke(DS.Color.muted.opacity(0.2)))
+                .padding(.top, DS.Spacing.xs)
             HStack {
-                Text("\(rawThought.count)/300").font(.caption).foregroundStyle(.secondary)
+                Text("\(rawThought.count)/300").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                 Spacer()
             }
         }
     }
 
     private var feelingStep: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("What feeling is underneath this?").font(.title3).bold()
-            Text("There’s no right answer. Tap whatever feels closest.").font(.footnote).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            Text("What feeling is underneath this?").font(DS.Typography.heading()).bold()
+            Text("There’s no right answer. Tap whatever feels closest.").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
 
             // Feeling step chips (iOS 16+ FlowLayout)
-            Flow(spacing: 8, rowSpacing: 8) {
+            Flow(spacing: DS.Spacing.sm, rowSpacing: 8) {
                 ForEach(Feeling.allCases) { item in
                     let isSelected = (feeling == item)
                     Button {
                         feeling = isSelected ? nil : item
                     } label: {
                         Chip(title: item.title, selected: isSelected, emoji: item.emoji,)
-                            .padding(4) // small padding so chips don't touch
+                            .padding(DS.Spacing.xs) // small padding so chips don't touch
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, 6)
+            .padding(.top, DS.Spacing.sm)
         }
     }
 
     // MARK: - Why Step
     // MARK: - Why Step (general + write own + AI)
     private var whyStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
             Text("Step 2 of \(totalSteps)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(DS.Typography.body())
+                .foregroundStyle(DS.Color.muted)
 
             Text("Why do you think this thought showed up?")
-                .font(.title3).bold()
+                .font(DS.Typography.heading()).bold()
 
             // Built-in general reasons (chips)
-            Flow(spacing: 8, rowSpacing: 8) {
+            Flow(spacing: DS.Spacing.sm, rowSpacing: 8) {
                 ForEach(WhyOption.allCases) { option in
                     let isSelected = (whyChoice == option)
                     Button {
@@ -317,33 +317,33 @@ struct ThoughtBuilderWizard: View {
             }
 
             // AI button + status
-            HStack(spacing: 12) {
+            HStack(spacing: DS.Spacing.md) {
                 Button {
                     fetchAIWhyIdeas()
                 } label: {
                     if aiWhyLoading {
                         ProgressView().progressViewStyle(.circular)
-                            .padding(.trailing, 6)
+                            .padding(.trailing, DS.Spacing.sm)
                         Text("Getting ideas…")
                     } else {
                         Label("Ask AI for ideas", systemImage: "sparkles")
                     }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(SecondaryButtonStyle())
                 .disabled(aiWhyLoading)
 
                 if let err = aiWhyError {
-                    Text(err).font(.footnote).foregroundStyle(.secondary)
+                    Text(err).font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                 }
             }
 
             // Render AI suggestions as additional chips you can tap
             if !aiWhyIdeas.isEmpty {
                 Text("Suggestions from AI")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.body())
+                    .foregroundStyle(DS.Color.muted)
 
-                Flow(spacing: 8, rowSpacing: 8) {
+                Flow(spacing: DS.Spacing.sm, rowSpacing: 8) {
                     ForEach(aiWhyIdeas, id: \.self) { idea in
                         let isSelected = (isWritingCustomWhy && customWhy == idea)
                         Button {
@@ -352,7 +352,7 @@ struct ThoughtBuilderWizard: View {
                             whyChoice = nil
                         } label: {
                             Chip(title: idea, selected: isSelected, ai: true, animated: true)
-                                .padding(2) // breathing room
+                                .padding(DS.Spacing.xs) // breathing room
                         }
                         .buttonStyle(.plain)
                         .accessibilityHint("AI suggestion")
@@ -401,29 +401,29 @@ struct ThoughtBuilderWizard: View {
         var body: some View {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(selected ? Color.accentColor : .secondary)
+                    .foregroundStyle(selected ? DS.Color.accent : DS.Color.muted)
                     .imageScale(.large)
 
                 VStack(alignment: .leading, spacing: 6) {
                     if animated {
                         TypewriterText(fullText: text, speed: 0.015)
-                            .font(.body)
-                            .foregroundStyle(.primary)
+                            .font(DS.Typography.body())
+                            .foregroundStyle(DS.Color.onSurface)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Text(text)
-                            .font(.body)
-                            .foregroundStyle(.primary)
+                            .font(DS.Typography.body())
+                            .foregroundStyle(DS.Color.onSurface)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     if isAI { AIBadge() }
                 }
                 Spacer(minLength: 0)
             }
-            .padding(12)
+            .padding(DS.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(UIColor.separator), lineWidth: 1))
+            .background(DS.Color.surface.opacity(0.16), in: RoundedRectangle(cornerRadius: DS.Radius.md))
+            .overlay(RoundedRectangle(cornerRadius: DS.Radius.md).stroke(DS.Color.muted.opacity(0.3), lineWidth: 1))
         }
     }
 
@@ -431,8 +431,8 @@ struct ThoughtBuilderWizard: View {
 
     private var reviewStep: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Greyspace moment").font(.title3).bold()
-            Text("A balanced thought to carry with you.").font(.footnote).foregroundStyle(.secondary)
+            Text("Greyspace moment").font(DS.Typography.heading()).bold()
+            Text("A balanced thought to carry with you.").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
 
             PolaroidCard(original: rawThought, reframe: chosenReframe.isEmpty ? "Your softer thought will appear here." : chosenReframe)
                 .frame(height: 260)
@@ -444,13 +444,13 @@ struct ThoughtBuilderWizard: View {
                     }
                 }
 
-            Text("You can always edit or add to this later.").font(.footnote).foregroundStyle(.secondary)
+            Text("You can always edit or add to this later.").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
         }
     }
 
     // MARK: - Toolbar
     private var toolbar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DS.Spacing.md) {
             // Back
             Button("Back") {
                 if step == 1 { dismiss() }
@@ -470,12 +470,12 @@ struct ThoughtBuilderWizard: View {
                         } label: {
                             // Only show spinner on steps that actually use AI (adjust if needed)
                             if isAILoading && (step == 3 || step == 4) {
-                                HStack(spacing: 8) { ProgressView(); Text("Working…") }
+                                HStack(spacing: DS.Spacing.sm) { ProgressView(); Text("Working…") }
                             } else {
                                 Text("Next")
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(PrimaryButtonStyle())
                         // Keep your existing gating
                         .disabled(!canAdvanceCurrentStep || (isAILoading && (step == 3 || step == 4)))
                     } else {
@@ -488,12 +488,12 @@ struct ThoughtBuilderWizard: View {
                         } label: {
                             Text(isSaving ? "Saving…" : "Save")
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(PrimaryButtonStyle())
                         .disabled(chosenReframe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.vertical, DS.Spacing.md)
         .background(.thinMaterial)
     }
 
@@ -600,7 +600,7 @@ private struct Chip: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            HStack(spacing: 8) {
+            HStack(spacing: DS.Spacing.sm) {
                 if let emoji { Text(emoji) }
                 if animated {
                     TypewriterText(fullText: title, speed: 0.015)
@@ -612,16 +612,16 @@ private struct Chip: View {
                         .minimumScaleFactor(0.9)
                 }
             }
-            .font(.subheadline)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(selected ? Color.accentColor.opacity(0.18) : Color.secondary.opacity(0.08),
+            .font(DS.Typography.body())
+            .padding(.horizontal, DS.Spacing.md)
+            .padding(.vertical, DS.Spacing.md)
+            .background(selected ? DS.Color.accent.opacity(0.18) : DS.Color.surface.opacity(0.18),
                         in: Capsule())
             .overlay(
-                Capsule().stroke(selected ? Color.accentColor.opacity(0.6) : Color(UIColor.separator),
+                Capsule().stroke(selected ? DS.Color.accent.opacity(0.6) : DS.Color.muted.opacity(0.3),
                                  lineWidth: 1)
             )
-            .foregroundStyle(selected ? Color.accentColor : .primary)
+            .foregroundStyle(selected ? DS.Color.accent : DS.Color.onSurface)
             .accessibilityElement(children: .combine)
             // AI badge
             if ai {
@@ -638,7 +638,7 @@ private struct FlowChips<Item: Identifiable & Hashable, Content: View>: View {
     let content: (Item, Bool) -> Content
 
     var body: some View {
-        FlexibleView(data: items, spacing: 8, alignment: .leading) { item in
+        FlexibleView(data: items, spacing: DS.Spacing.sm, alignment: .leading) { item in
             let selected = selection == item
             Button {
                 selection = selected ? nil : item
@@ -672,7 +672,7 @@ private struct FlexibleView<Data: Collection, Content: View>: View where Data.El
             ZStack(alignment: Alignment(horizontal: alignment, vertical: .top)) {
                 ForEach(Array(data.enumerated()), id: \.1.id) { _, element in
                     content(element)
-                        .padding(.all, 4)
+                        .padding(.all, DS.Spacing.xs)
                         .alignmentGuide(.leading) { d in
                             if (abs(width - d.width) > geo.size.width) {
                                 width = 0
@@ -810,15 +810,15 @@ struct DefaultLocalReframer: ReframeSuggester {
 // MARK: - Small helpers
 private struct AIBadge: View {
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: DS.Spacing.xs) {
             Image(systemName: "sparkles").imageScale(.small)
-            Text("AI").font(.caption2).fontWeight(.semibold)
+            Text("AI").font(DS.Typography.caption()).fontWeight(.semibold)
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, DS.Spacing.sm)
         .padding(.vertical, 3)
-        .background(Color.accentColor.opacity(0.12), in: Capsule())
-        .overlay(Capsule().stroke(Color.accentColor.opacity(0.35), lineWidth: 1))
-        .foregroundStyle(Color.accentColor)
+        .background(DS.Color.accent.opacity(0.12), in: Capsule())
+        .overlay(Capsule().stroke(DS.Color.accent.opacity(0.35), lineWidth: 1))
+        .foregroundStyle(DS.Color.accent)
         .accessibilityLabel("AI suggestion")
     }
 }
@@ -852,15 +852,15 @@ private struct StepHeader2: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(title).font(.headline)
-                Text("Step \(step) of \(total)").font(.caption).foregroundStyle(.secondary)
+                Text(title).font(DS.Typography.heading())
+                Text("Step \(step) of \(total)").font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
             }
             Spacer()
             ProgressView(value: Double(step), total: Double(total))
                 .frame(width: 120)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.top, DS.Spacing.sm)
     }
 }
 

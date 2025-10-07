@@ -13,10 +13,13 @@ struct MindfulnessView: View {
     @State private var isRunning = false
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: DS.Spacing.xl) {
             Text("One-Breath Reset")
-                .font(.title2).bold()
+                .font(DS.Typography.title())
+                .foregroundStyle(DS.Color.onSurface)
             Text("Inhale as the circle expands. Exhale as it shrinks. Do 3 cycles.")
+                .font(DS.Typography.body())
+                .foregroundStyle(DS.Color.muted)
                 .multilineTextAlignment(.center)
 
             Circle()
@@ -30,7 +33,8 @@ struct MindfulnessView: View {
                 .onDisappear {
                     isRunning = false
                 }
+                .foregroundStyle(DS.Color.accent.opacity(0.2))
         }
-        .padding()
+        .padding(DS.Spacing.xl)
     }
 }

@@ -15,29 +15,29 @@ struct ThoughtHelperIntroView: View {
         VStack(spacing: 28) {
             Spacer()
             
-            VStack(spacing: 16) {
+            VStack(spacing: DS.Spacing.lg) {
                 Text("Thought Helper")
-                    .font(.largeTitle).bold()
+                    .font(DS.Typography.display()).bold()
 
                 Text("This space is for sticky, unhelpful thoughts; The kind of thoughts that loop or weigh on you. "
                      + "We’ll gently walk you through a few steps to look at the thought in a new way. "
                      + "It’s not about fixing or erasing, just softening how it feels.")
                     .multilineTextAlignment(.center)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 24)
+                    .font(DS.Typography.body())
+                    .foregroundStyle(DS.Color.muted)
+                    .padding(.horizontal, DS.Spacing.xl)
             }
 
             Spacer()
 
             Button(action: onStart) {
                 Text("Let’s Start")
-                    .font(.headline)
+                    .font(DS.Typography.heading())
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
+                    .background(DS.Color.accent, in: RoundedRectangle(cornerRadius: DS.Radius.md))
+                    .foregroundColor(DS.Color.onSurface)
+                    .padding(.horizontal, DS.Spacing.xl)
             }
         }
     }

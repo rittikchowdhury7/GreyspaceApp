@@ -50,18 +50,18 @@ struct ReframeLibraryView: View {
     @ViewBuilder
     private var content: some View {
         if filtered.isEmpty {
-            VStack(spacing: 8) {
-                Text("No reframes yet").font(.headline)
+            VStack(spacing: DS.Spacing.sm) {
+                Text("No reframes yet").font(DS.Typography.heading())
                 Text("Create a Greyspace moment from the Thought Helper.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.body())
+                    .foregroundStyle(DS.Color.muted)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
         } else {
-            let cols = [GridItem(.adaptive(minimum: 280), spacing: 12)]
+            let cols = [GridItem(.adaptive(minimum: 280), spacing: DS.Spacing.md)]
             ScrollView {
-                LazyVGrid(columns: cols, spacing: 16) {
+                LazyVGrid(columns: cols, spacing: DS.Spacing.lg) {
                     ForEach(filtered) { r in
                         NavigationLink {
                             PolaroidMomentView(
@@ -93,9 +93,9 @@ struct ReframeLibraryView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
+                .padding(.horizontal, DS.Spacing.lg)
+                .padding(.top, DS.Spacing.md)
+                .padding(.bottom, DS.Spacing.xl)
             }
         }
     }

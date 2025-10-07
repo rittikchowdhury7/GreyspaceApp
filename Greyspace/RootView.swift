@@ -31,5 +31,6 @@ struct RootView: View {
                 .tabItem { Label("Support", systemImage: "heart") }
                 .tag(Tab.support)
         }
+        .background(DS.Color.background.ignoresSafeArea())
     }
 }
