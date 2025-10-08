@@ -31,10 +31,11 @@ struct CheckInIntroSheet: View {
             points: points,
             dontShowAgain: $localSkip,
             startLabel: startLabel,
+            onStart: {
+                if localSkip { skipIntro = true }
+                onStart()
+            },
             language: language
-        ) {
-            if localSkip { skipIntro = true }
-            onStart()
-        }
+        )
     }
 }

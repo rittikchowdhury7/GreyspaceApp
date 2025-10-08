@@ -34,11 +34,12 @@ struct PressureIntroContainer: View {
                     points: points,
                     dontShowAgain: $localSkip,
                     startLabel: startLabel,
+                    onStart: {
+                        if localSkip { skipIntro = true }
+                        withAnimation { showIntro = false }
+                    },
                     language: language
-                ) {
-                    if localSkip { skipIntro = true }
-                    withAnimation { showIntro = false }
-                }
+                )
             } else {
                 PressureListView()   // your existing list/grid
             }
