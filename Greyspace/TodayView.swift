@@ -29,6 +29,7 @@ struct TodayView: View {
     @State private var notes: String = ""
     @State private var didMindfulness: Bool = false
     @AppStorage("intro.skip.checkin") private var skipCheckInIntro = false
+    @AppStorage(AppLanguage.storageKey) private var appLanguageCode: String = AppLanguage.defaultCode
     @State private var showCheckInIntro = false
 
     // ✅ These should be local state, not @Binding
@@ -65,7 +66,8 @@ struct TodayView: View {
     // MARK: - HOME
 
     private var homeCard: some View {
-        ScrollView {
+        let language = AppLanguage.resolved(for: appLanguageCode)
+        return ScrollView {
             VStack(spacing: DS.Spacing.xl) {
                 SurfaceCard {
                     HStack(spacing: DS.Spacing.lg) {
@@ -114,7 +116,9 @@ struct TodayView: View {
                                 .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
                         }
                         if !last.gratitude.isEmpty {
-                            Text("Gratitude: " + last.gratitude.joined(separator: ", "))
+                            let gratitudeList = last.gratitude.joined(separator: ", ")
+                            let format = Localization.string("today.last.gratitude", fallback: "Gratitude: %@", language: language)
+                            Text(String(format: format, gratitudeList))
                                 .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                                 .lineLimit(1)
                         } else if !last.notes.isEmpty {

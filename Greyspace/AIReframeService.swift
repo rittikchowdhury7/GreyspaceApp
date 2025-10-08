@@ -21,12 +21,19 @@ enum AIReframeError: LocalizedError {
     case decodingFailed
 
     var errorDescription: String? {
+        let language = Localization.currentLanguage()
         switch self {
-        case .emptyThought:   return "Thought input is empty."
-        case .missingAPIKey:  return "Missing API key."
-        case .badHTTPStatus(let code): return "Server returned status \(code)."
-        case .badResponse:    return "Invalid response from server."
-        case .decodingFailed: return "Could not decode AI response."
+        case .emptyThought:
+            return Localization.string("error.ai.emptyThought", fallback: "Thought input is empty.", language: language)
+        case .missingAPIKey:
+            return Localization.string("error.ai.missingKey", fallback: "Missing API key.", language: language)
+        case .badHTTPStatus(let code):
+            let format = Localization.string("error.ai.status", fallback: "Server returned status %d.", language: language)
+            return String(format: format, code)
+        case .badResponse:
+            return Localization.string("error.ai.badResponse", fallback: "Invalid response from server.", language: language)
+        case .decodingFailed:
+            return Localization.string("error.ai.decoding", fallback: "Could not decode AI response.", language: language)
         }
     }
 }
@@ -36,6 +43,7 @@ enum AIReframeError: LocalizedError {
 struct AIReframeService {
     /// Provide your API key via this closure. If it returns nil/empty, local fallback is used.
     var apiKeyProvider: () -> String?
+    var languageCodeProvider: () -> String
 
     /// OpenAI model names that support the **Responses** API (JSON control).
     var model: String = "gpt-4o-mini"
@@ -44,8 +52,11 @@ struct AIReframeService {
     /// Default initializer: read OPENAI_API_KEY from Info.plist (optional).
     init(apiKeyProvider: @escaping () -> String? = {
         (Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String)
+    }, languageCodeProvider: @escaping () -> String = {
+        UserDefaults.standard.string(forKey: AppLanguage.storageKey) ?? AppLanguage.defaultCode
     }) {
         self.apiKeyProvider = apiKeyProvider
+        self.languageCodeProvider = languageCodeProvider
     }
 }
 
@@ -66,6 +77,7 @@ extension AIReframeService {
                          why: String? = nil,
                          limit: Int = 5) async throws -> [String] {
         let t = thought.trimmed
+        let language = AppLanguage.resolved(for: languageCodeProvider())
         let hasKey = (apiKeyProvider()?.trimmed.isEmpty == false)
         print("AIReframeService will use \(hasKey ? "API" : "LOCAL") path")
         guard !t.isEmpty else { throw AIReframeError.emptyThought }
@@ -73,7 +85,12 @@ extension AIReframeService {
         // 1) Try OpenAI if key present
         if let key = apiKeyProvider()?.trimmed, !key.isEmpty {
             do {
-                let fromAPI = try await reframeFromAPI(thought: t, feeling: feeling, why: why, limit: limit, apiKey: key)
+                let fromAPI = try await reframeFromAPI(thought: t,
+                                                      feeling: feeling,
+                                                      why: why,
+                                                      limit: limit,
+                                                      language: language,
+                                                      apiKey: key)
                 if !fromAPI.isEmpty { return fromAPI }
             } catch {
                 // fall through to local
@@ -81,7 +98,11 @@ extension AIReframeService {
         }
 
         // 2) Local fallback (always)
-        return LocalReframeEngine.propose(thought: t, feeling: feeling, why: why, limit: limit)
+        return LocalReframeEngine.propose(thought: t,
+                                          feeling: feeling,
+                                          why: why,
+                                          limit: limit,
+                                          language: language)
     }
 
     /// “Why did this thought show up?” suggestions. Works offline; uses API if available.
@@ -89,29 +110,40 @@ extension AIReframeService {
     func whySuggestions(for thought: String,
                         feeling: String? = nil,
                         limit: Int = 8) async -> [String] {
+        let language = AppLanguage.resolved(for: languageCodeProvider())
         // 1) Try API (if key)
         if let key = apiKeyProvider()?.trimmed, !key.isEmpty {
             do {
-                let arr = try await whyFromAPI(thought: thought.trimmed, feeling: feeling?.trimmed, apiKey: key, limit: limit)
+                let arr = try await whyFromAPI(thought: thought.trimmed,
+                                               feeling: feeling?.trimmed,
+                                               language: language,
+                                               apiKey: key,
+                                               limit: limit)
                 if !arr.isEmpty { return Array(arr.prefix(limit)) }
             } catch {
                 // fall back
             }
         }
         // 2) Local
-        return Array(LocalWhyEngine.suggest(thought: thought, feeling: feeling).prefix(limit))
+        return Array(LocalWhyEngine.suggest(thought: thought,
+                                            feeling: feeling,
+                                            language: language).prefix(limit))
     }
 }
 
 // MARK: - Local Heuristics (fast, no network)
 private enum LocalReframeEngine {
-    static func propose(thought: String, feeling: String?, why: String?, limit: Int) -> [String] {
+    static func propose(thought: String,
+                        feeling: String?,
+                        why: String?,
+                        limit: Int,
+                        language: AppLanguage) -> [String] {
         var out: [String] = [
-            "This urge is a signal, not my identity. I can choose a kinder action.",
-            "I can be honest about how I feel without judging myself.",
-            "I’m allowed to be a work in progress and still be worthy.",
-            "I can make space for this feeling and then take one small helpful step.",
-            "I can seek connection directly instead of through this old pattern."
+            Localization.string("local.reframe.base.signal", fallback: "This urge is a signal, not my identity. I can choose a kinder action.", language: language),
+            Localization.string("local.reframe.base.honest", fallback: "I can be honest about how I feel without judging myself.", language: language),
+            Localization.string("local.reframe.base.progress", fallback: "I’m allowed to be a work in progress and still be worthy.", language: language),
+            Localization.string("local.reframe.base.space", fallback: "I can make space for this feeling and then take one small helpful step.", language: language),
+            Localization.string("local.reframe.base.connection", fallback: "I can seek connection directly instead of through this old pattern.", language: language)
         ]
 
         let t = thought.lowercased()
@@ -119,28 +151,28 @@ private enum LocalReframeEngine {
         let w = (why ?? "").lowercased()
 
         if f.contains("anxiety") || f.contains("stress") || t.contains("nervous") {
-            out.append("I’m stressed; a pause helps me say what I actually need.")
+            out.append(Localization.string("local.reframe.add.stress", fallback: "I’m stressed; a pause helps me say what I actually need.", language: language))
         }
         if f.contains("anger") || t.contains("angry") || t.contains("mad") {
-            out.append("My anger wants release; I can cool off and speak clearly later.")
+            out.append(Localization.string("local.reframe.add.anger", fallback: "My anger wants release; I can cool off and speak clearly later.", language: language))
         }
         if f.contains("sad") || f.contains("lonely") || t.contains("alone") {
-            out.append("I’m craving support; I can ask for connection directly.")
+            out.append(Localization.string("local.reframe.add.lonely", fallback: "I’m craving support; I can ask for connection directly.", language: language))
         }
         if w.contains("accept") || w.contains("fit") || w.contains("belong") {
-            out.append("I want to belong; I can build closeness by being genuine.")
+            out.append(Localization.string("local.reframe.add.belong", fallback: "I want to belong; I can build closeness by being genuine.", language: language))
         }
         if w.contains("judge") || w.contains("perfection") || t.contains("perfect") || t.contains("fail") {
-            out.append("I don’t have to be perfect to be acceptable.")
+            out.append(Localization.string("local.reframe.add.perfect", fallback: "I don’t have to be perfect to be acceptable.", language: language))
         }
         if w.contains("protect") || w.contains("safety") || w.contains("defend") {
-            out.append("I’m trying to stay safe; I can choose protection that doesn’t hurt me or others.")
+            out.append(Localization.string("local.reframe.add.protect", fallback: "I’m trying to stay safe; I can choose protection that doesn’t hurt me or others.", language: language))
         }
         if w.contains("guilt") || t.contains("should") {
-            out.append("I can care for others without abandoning myself.")
+            out.append(Localization.string("local.reframe.add.guilt", fallback: "I can care for others without abandoning myself.", language: language))
         }
         if w.contains("control") || t.contains("control") {
-            out.append("I can focus on what I influence and let the rest be uncertain.")
+            out.append(Localization.string("local.reframe.add.control", fallback: "I can focus on what I influence and let the rest be uncertain.", language: language))
         }
 
         return dedup(out, cap: limit)
@@ -148,34 +180,40 @@ private enum LocalReframeEngine {
 }
 
 private enum LocalWhyEngine {
-    static func suggest(thought: String, feeling: String?) -> [String] {
+    static func suggest(thought: String, feeling: String?, language: AppLanguage) -> [String] {
         var base: [String] = [
-            "Fear of judgment",
-            "Wanting control",
-            "Seeking acceptance/belonging",
-            "Protecting myself from being hurt",
-            "Feeling guilty or responsible",
-            "Seeking comfort or relief",
-            "Feeling overwhelmed or burned out",
-            "Uncertainty or fear of the unknown",
-            "Comparing myself to others",
-            "Old habit that used to help"
+            Localization.string("local.why.base.judgment", fallback: "Fear of judgment", language: language),
+            Localization.string("local.why.base.control", fallback: "Wanting control", language: language),
+            Localization.string("local.why.base.acceptance", fallback: "Seeking acceptance/belonging", language: language),
+            Localization.string("local.why.base.protect", fallback: "Protecting myself from being hurt", language: language),
+            Localization.string("local.why.base.guilt", fallback: "Feeling guilty or responsible", language: language),
+            Localization.string("local.why.base.comfort", fallback: "Seeking comfort or relief", language: language),
+            Localization.string("local.why.base.overwhelm", fallback: "Feeling overwhelmed or burned out", language: language),
+            Localization.string("local.why.base.uncertainty", fallback: "Uncertainty or fear of the unknown", language: language),
+            Localization.string("local.why.base.compare", fallback: "Comparing myself to others", language: language),
+            Localization.string("local.why.base.habit", fallback: "Old habit that used to help", language: language)
         ]
 
         let t = thought.lowercased()
         let f = (feeling ?? "").lowercased()
 
         if t.contains("perfect") || t.contains("fail") || f.contains("anxiety") || f.contains("stress") {
-            base.append(contentsOf: ["Perfectionism / fear of mistakes", "Catastrophizing outcomes"])
+            base.append(contentsOf: [
+                Localization.string("local.why.add.perfection", fallback: "Perfectionism / fear of mistakes", language: language),
+                Localization.string("local.why.add.catastrophizing", fallback: "Catastrophizing outcomes", language: language)
+            ])
         }
         if t.contains("alone") || t.contains("left out") || f.contains("lonely") {
-            base.append("Fear of being left out or abandoned")
+            base.append(Localization.string("local.why.add.abandoned", fallback: "Fear of being left out or abandoned", language: language))
         }
         if t.contains("family") || t.contains("parents") {
-            base.append(contentsOf: ["Navigating family expectations", "Trying to keep the peace at home"])
+            base.append(contentsOf: [
+                Localization.string("local.why.add.familyExpectations", fallback: "Navigating family expectations", language: language),
+                Localization.string("local.why.add.keepPeace", fallback: "Trying to keep the peace at home", language: language)
+            ])
         }
         if t.contains("work") || t.contains("school") {
-            base.append("Pressure to perform at work/school")
+            base.append(Localization.string("local.why.add.perform", fallback: "Pressure to perform at work/school", language: language))
         }
 
         return dedup(base, cap: 20)
@@ -189,20 +227,31 @@ private extension AIReframeService {
                                 feeling: String?,
                                 why: String?,
                                 limit: Int,
+                                language: AppLanguage,
                                 apiKey: String) async throws -> [String] {
-        
+
+        let languageInstruction: String
+        if language.code == "system" {
+            languageInstruction = "Match the user’s language. If unsure, respond in English."
+        } else {
+            let code = language.localeIdentifier ?? "en"
+            languageInstruction = "Respond in \(language.englishName) (language code: \(code))."
+        }
+
         let sys = """
         You help users write balanced, compassionate reframes of sticky thoughts.
         Return ONLY compact JSON: {"reframes":["...", "..."]}.
         Rules: 1–2 short sentences each, plain language, no clinical advice or diagnoses.
         Avoid toxic positivity; be realistic and validating.
+        \(languageInstruction)
         """
-        
+
         let user = """
         Thought: "\(thought)"
         Feeling: "\(feeling ?? "")"
         Why it showed up (user’s guess): "\(why ?? "")"
         Generate \(max(3, min(7, limit))) distinct, broadly applicable reframes.
+        Preferred language: \(language.englishName)
         """
         let keyPreview = apiKeyProvider()?.prefix(6) ?? "nil"
         debugLog("Key present? ->", keyPreview, "…")
@@ -255,19 +304,30 @@ private extension AIReframeService {
     // whyFromAPI (chat/completions)
     private func whyFromAPI(thought: String,
                             feeling: String?,
+                            language: AppLanguage,
                             apiKey: String,
                             limit: Int) async throws -> [String] {
-        
+
+        let languageInstruction: String
+        if language.code == "system" {
+            languageInstruction = "Match the user’s language. If unsure, respond in English."
+        } else {
+            let code = language.localeIdentifier ?? "en"
+            languageInstruction = "Respond in \(language.englishName) (language code: \(code))."
+        }
+
         let sys = """
         You help users explore why a difficult thought might show up.
         Return ONLY a compact json object exactly like: {"suggestions":["...", "..."]}.
         No clinical jargon; <= 7 words each.
+        \(languageInstruction)
         """
-        
+
         let user = """
         Thought: "\(thought)"
         Feeling (optional): "\(feeling ?? "")"
         Provide \(max(6, min(10, limit))) broad, non-clinical reasons.
+        Preferred language: \(language.englishName)
         """
         
         var req = URLRequest(url: URL(string: "https://api.openai.com/v1/chat/completions")!)
