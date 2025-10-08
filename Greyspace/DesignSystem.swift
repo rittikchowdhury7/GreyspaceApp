@@ -30,9 +30,10 @@ enum DS {
     }
 
     enum Typography {
-        static func display() -> Font { .custom("OpenSans-Black", size: 34, relativeTo: .largeTitle) }
-        static func title() -> Font { .custom("OpenSans-SemiBold", size: 28, relativeTo: .title) }
-        static func heading() -> Font { .custom("OpenSans-Medium", size: 20, relativeTo: .headline) }
+        static func display() -> Font { .custom("OpenSans-ExtraBold", size: 34, relativeTo: .largeTitle) }
+        static func title() -> Font { .custom("OpenSans-Bold", size: 28, relativeTo: .title) }
+        static func heading() -> Font { .custom("OpenSans-SemiBold", size: 20, relativeTo: .headline) }
+        static func button() -> Font { .custom("OpenSans-Bold", size: 18, relativeTo: .headline) }
         static func body() -> Font { .custom("OpenSans-Regular", size: 16, relativeTo: .body) }
         static func caption() -> Font { .custom("OpenSans-Light", size: 13, relativeTo: .caption) }
         static func thinDisplay() -> Font { .custom("OpenSans-Thin", size: 42, relativeTo: .largeTitle) }

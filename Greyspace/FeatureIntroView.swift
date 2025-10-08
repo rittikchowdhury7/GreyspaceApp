@@ -16,13 +16,18 @@ struct FeatureIntroView: View {
     @Binding var dontShowAgain: Bool
     let startLabel: String
     let onStart: () -> Void
+    let language: AppLanguage
 
     var body: some View {
+        let dontShowLabel = Localization.string("intro.toggle.dontShow", fallback: "Don’t show again", language: language)
+
         VStack(spacing: DS.Spacing.xl) {
             Spacer(minLength: 12)
 
             VStack(spacing: DS.Spacing.md) {
-                Text(title).font(DS.Typography.display()).bold().multilineTextAlignment(.center)
+                Text(title)
+                    .font(DS.Typography.display())
+                    .multilineTextAlignment(.center)
                 Text(blurb)
                     .font(DS.Typography.body())
                     .foregroundStyle(DS.Color.muted)
@@ -49,7 +54,7 @@ struct FeatureIntroView: View {
 
             Spacer()
 
-            Toggle("Don’t show again", isOn: $dontShowAgain)
+            Toggle(dontShowLabel, isOn: $dontShowAgain)
                 .font(DS.Typography.body())
                 .padding(.horizontal, DS.Spacing.xl)
 

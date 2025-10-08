@@ -3,7 +3,7 @@ import SwiftUI
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(DS.Typography.heading())
+            .font(DS.Typography.button())
             .padding(.vertical, DS.Spacing.sm)
             .padding(.horizontal, DS.Spacing.xl)
             .background(DS.Color.primary)
@@ -18,7 +18,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(DS.Typography.heading())
+            .font(DS.Typography.button())
             .padding(.vertical, DS.Spacing.sm)
             .padding(.horizontal, DS.Spacing.xl)
             .background(DS.Color.surface)

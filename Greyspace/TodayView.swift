@@ -101,38 +101,48 @@ struct TodayView: View {
                         Spacer()
                     }
                 }
+                .frame(maxWidth: 520, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, DS.Spacing.lg)
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                         if let last = entries.first {
                             Text("Last check-in")
-                                .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+                                .font(DS.Typography.body())
+                                .foregroundStyle(DS.Color.muted)
+
                             HStack {
                                 Text(last.date, style: .date)
-                            Text("•")
-                            Text(last.date, style: .time)
-                            Spacer()
-                            Text("Mood \(last.mood)/5 · A \(last.anxiety)/10")
+                                Text("•")
+                                Text(last.date, style: .time)
+                                Spacer()
+                                Text("Mood \(last.mood)/5 · A \(last.anxiety)/10")
+                                    .font(DS.Typography.body())
+                                    .foregroundStyle(DS.Color.muted)
+                            }
+
+                            if !last.gratitude.isEmpty {
+                                let gratitudeList = last.gratitude.joined(separator: ", ")
+                                let format = Localization.string("today.last.gratitude", fallback: "Gratitude: %@", language: language)
+                                Text(String(format: format, gratitudeList))
+                                    .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
+                                    .lineLimit(1)
+                            } else if !last.notes.isEmpty {
+                                Text("“\(last.notes)”")
+                                    .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
+                                    .lineLimit(1)
+                            }
+                        } else {
+                            Text("No entries yet — a 60-second snapshot is a great first step.")
                                 .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
                         }
-                        if !last.gratitude.isEmpty {
-                            let gratitudeList = last.gratitude.joined(separator: ", ")
-                            let format = Localization.string("today.last.gratitude", fallback: "Gratitude: %@", language: language)
-                            Text(String(format: format, gratitudeList))
-                                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
-                                .lineLimit(1)
-                        } else if !last.notes.isEmpty {
-                            Text("“\(last.notes)”")
-                                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
-                                .lineLimit(1)
-                        }
-                    } else {
-                        Text("No entries yet — a 60-second snapshot is a great first step.")
-                            .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
-                    }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .frame(maxWidth: 520, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, DS.Spacing.lg)
 
                 // CTA
                 // In TodayView, replace your Start Check-In button with:

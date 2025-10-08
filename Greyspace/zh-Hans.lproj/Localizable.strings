@@ -31,6 +31,38 @@
 "Everyday Pressures" = "每日压力";
 "Export as text" = "导出为文本";
 "Feature Intros" = "功能介绍";
+
+// Intro screens
+"intro.checkin.title" = "每日签到";
+"intro.checkin.blurb" = "用60秒记录你的情绪、压力、感恩和笔记。想的话可以添加照片。内容仅保存在你的设备上。";
+"intro.checkin.point1" = "快速评估情绪和焦虑";
+"intro.checkin.point2" = "可选的感恩与笔记";
+"intro.checkin.point3" = "用照片记录你的一天";
+"intro.checkin.start" = "开始签到";
+
+"intro.mindfulness.title" = "一口气重置";
+"intro.mindfulness.blurb" = "10秒的小休息。圆圈扩张时吸气，柔和时呼气。做1–3轮。";
+"intro.mindfulness.point1" = "没有计时压力——跟着动画即可。";
+"intro.mindfulness.point2" = "分心也没关系，温柔地带回注意力。";
+"intro.mindfulness.point3" = "短暂的停顿也有价值。";
+"intro.mindfulness.start" = "开始";
+
+"intro.pressure.title" = "日常压力卡片";
+"intro.pressure.blurb" = "针对常见的文化与家庭压力的快速卡片。翻转即可看到更柔和的角度，或在可选的AI帮助下添加自己的卡片。";
+"intro.pressure.point1" = "轻点卡片即可翻面，获得更轻松的想法。";
+"intro.pressure.point2" = "滑动整副卡片寻找灵感。";
+"intro.pressure.point3" = "添加你自己的压力并保存重构结果。";
+"intro.pressure.start" = "浏览卡片";
+
+"intro.thought.title" = "思维助手";
+"intro.thought.blurb" = "这里专为那些纠缠不休、让人沉重的念头准备。我们会温和地引导你走过几个步骤，用新的角度看待它。不是要修复或抹去，而是让感觉柔和一些。";
+"intro.thought.container.blurb" = "这里为那些缠绕不去、让人沉重的念头而设。我们会一步步引导你找到更温和的角度。这不是要修复，而是让感受轻一些。";
+"intro.thought.point1" = "从一个真实的念头开始（不是问题）。";
+"intro.thought.point2" = "说出它带来的情绪。";
+"intro.thought.point3" = "选一个更温和的看法，或写下自己的（AI 可以帮忙！）。";
+"intro.thought.start" = "开始吧";
+
+"intro.toggle.dontShow" = "不再显示";
 "General" = "通用";
 "Gentle view" = "更温和的看法";
 "Getting ideas…" = "正在获取灵感…";

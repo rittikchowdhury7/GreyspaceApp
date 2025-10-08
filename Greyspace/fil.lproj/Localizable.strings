@@ -31,6 +31,38 @@
 "Everyday Pressures" = "Mga pang-araw-araw na pressure";
 "Export as text" = "I-export bilang text";
 "Feature Intros" = "Mga pambungad";
+
+// Intro screens
+"intro.checkin.title" = "Araw-araw na Check-In";
+"intro.checkin.blurb" = "Kumuha ng 60-segundong snapshot ng iyong mood, stress, pasasalamat, at mga tala. Magdagdag ng mga larawan kung gusto mo. Pribado ito at nakaimbak lang sa iyong device.";
+"intro.checkin.point1" = "Mabilis na i-rate ang mood at pagkabalisa";
+"intro.checkin.point2" = "Opsyonal ang pasasalamat at mga tala";
+"intro.checkin.point3" = "I-capture ang araw gamit ang mga larawan";
+"intro.checkin.start" = "Simulan ang Check-In";
+
+"intro.mindfulness.title" = "Isang-hingang Reset";
+"intro.mindfulness.blurb" = "10 segundong reset. Huminga nang papasok habang lumalawak ang bilog; huminga palabas habang lumalambot. Gawin ang 1–3 cycle.";
+"intro.mindfulness.point1" = "Walang pressure sa timer — sundan lang ang animasyon.";
+"intro.mindfulness.point2" = "Okay lang kung lumipad ang isip mo. Dahan-dahang ibalik.";
+"intro.mindfulness.point3" = "Mahalaga kahit maikling pahinga.";
+"intro.mindfulness.start" = "Simulan";
+
+"intro.pressure.title" = "Mga Pang-araw-araw na Pressure";
+"intro.pressure.blurb" = "Mabilis na mga card para sa karaniwang pressure sa kultura at pamilya. Baliktarin para sa mas mahinahong pananaw, o gumawa ng sarili gamit ang opsyonal na AI.";
+"intro.pressure.point1" = "Tapikin ang card para makita ang mas magaan na pananaw.";
+"intro.pressure.point2" = "I-swipe ang deck para sa mga ideya.";
+"intro.pressure.point3" = "Idagdag ang sarili mong pressure at i-save ang mga reframe.";
+"intro.pressure.start" = "Tumingin ng mga Card";
+
+"intro.thought.title" = "Katulong sa Pag-iisip";
+"intro.thought.blurb" = "Ang espasyong ito ay para sa mga nakakapit at hindi nakatutulong na isip; yaong paulit-ulit o mabigat sa dibdib. Dahan-dahan ka naming gagabayan sa ilang hakbang para makita ang isip sa bagong paraan. Hindi ito tungkol sa pag-aayos o pagbura, kundi sa pagpapagaan ng pakiramdam.";
+"intro.thought.container.blurb" = "Ang espasyong ito ay para sa mga nakakapit at hindi nakatutulong na isip; yaong paulit-ulit o mabigat. Dahan-dahan ka naming gagabayan sa ilang hakbang para makahanap ng mas mahinahong pananaw. Hindi ito para ayusin, kundi para lumuwag ang pakiramdam.";
+"intro.thought.point1" = "Magsimula sa isang totoong isip (hindi tanong).";
+"intro.thought.point2" = "Pangalanan ang damdaming hatid nito.";
+"intro.thought.point3" = "Pumili ng mas banayad na pananaw o gumawa ng sarili (puwedeng tumulong ang AI!).";
+"intro.thought.start" = "Magsimula Tayo";
+
+"intro.toggle.dontShow" = "Huwag nang ipakita muli";
 "General" = "Pangkalahatan";
 "Gentle view" = "Mas banayad na pananaw";
 "Getting ideas…" = "Kumukuha ng mga ideya…";
