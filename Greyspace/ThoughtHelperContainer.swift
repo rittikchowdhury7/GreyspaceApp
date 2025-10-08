@@ -36,11 +36,12 @@ struct ThoughtHelperContainer: View {
                     points: points,
                     dontShowAgain: $localSkip,
                     startLabel: startLabel,
-                    language: language
-                ) {
+                    onStart: {
                     if localSkip { skipIntro = true }
                     withAnimation { showIntro = false }
-                }
+                },
+                    language: language
+                )
             } else {
                 ThoughtBuilderWizard()
             }
