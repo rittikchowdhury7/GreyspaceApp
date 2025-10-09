@@ -15,9 +15,9 @@ struct PressurePointSlip: View {
     private let speech = AVSpeechSynthesizer()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(trigger).font(.headline)
-            Text(slip).font(.body)
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+            Text(trigger).font(DS.Typography.heading())
+            Text(slip).font(DS.Typography.body())
 
             HStack {
                 Button {
@@ -34,11 +34,11 @@ struct PressurePointSlip: View {
 
                 Spacer()
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(SecondaryButtonStyle())
         }
         .padding()
-        .background(.secondary.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(DS.Color.surface.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.md))
     }
 }
 
@@ -84,39 +84,39 @@ struct PressurePointsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: DS.Spacing.lg) {
                     // Header + Add button
                     HStack {
                         Text("Everyday Pressures")
-                            .font(.title3).bold()
+                            .font(DS.Typography.heading()).bold()
                         Spacer()
                         Button {
                             showAdd = true
                         } label: {
                             Label("Add", systemImage: "plus")
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(SecondaryButtonStyle())
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+                    .padding(.horizontal, DS.Spacing.lg)
+                    .padding(.top, DS.Spacing.sm)
 
                     // Search
                     HStack {
                         Image(systemName: "magnifyingglass")
                         TextField("Search…", text: $query)
                     }
-                    .padding(12)
-                    .background(.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(UIColor.separator), lineWidth: 1))
-                    .padding(.horizontal, 16)
+                    .padding(DS.Spacing.md)
+                    .background(.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: DS.Radius.md))
+                    .overlay(RoundedRectangle(cornerRadius: DS.Radius.md).stroke(DS.Color.muted.opacity(0.3), lineWidth: 1))
+                    .padding(.horizontal, DS.Spacing.lg)
 
                     // Your saved pressures (if any)
                     if !filteredYours.isEmpty {
                         Text("Yours")
-                            .font(.subheadline).foregroundStyle(.secondary)
-                            .padding(.horizontal, 16)
+                            .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+                            .padding(.horizontal, DS.Spacing.lg)
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: DS.Spacing.md)], spacing: DS.Spacing.md) {
                             ForEach(filteredYours) { p in
                                 MiniPressureCard(title: p.trigger)
                                     .contextMenu {
@@ -130,25 +130,25 @@ struct PressurePointsView: View {
                                     }
                             }
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, DS.Spacing.lg)
                     }
 
                     // Starter deck
                     Text("Starter deck")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                        .padding(.horizontal, 16)
+                        .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+                        .padding(.horizontal, DS.Spacing.lg)
 
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: DS.Spacing.md)], spacing: DS.Spacing.md) {
                         ForEach(filteredStarter, id: \.0) { item in
                             MiniPressureCard(title: item.0)
                                 .onTapGesture { openFlash(startingAt: item.0) }
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
 
                     Spacer(minLength: 24)
                 }
-                .padding(.top, 12)
+                .padding(.top, DS.Spacing.md)
             }
             .navigationTitle("Everyday Pressures")
             .task { seedIfNeeded() }
@@ -219,21 +219,21 @@ final class PressureSlip {
 private struct MiniPressureCard: View {
     let title: String
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(3)
             Spacer(minLength: 0)
         }
-        .padding(12)
+        .padding(DS.Spacing.md)
         .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color(UIColor.secondarySystemBackground))
+            RoundedRectangle(cornerRadius: DS.Radius.lg)
+                .fill(DS.Color.surface)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(UIColor.separator), lineWidth: 1)
+            RoundedRectangle(cornerRadius: DS.Radius.lg)
+                .stroke(DS.Color.muted.opacity(0.3), lineWidth: 1)
         )
     }
 }

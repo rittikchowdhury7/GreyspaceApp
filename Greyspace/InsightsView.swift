@@ -18,19 +18,19 @@ struct InsightsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: DS.Spacing.lg) {
 
                     // Mood trend
                     Card {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                             HStack {
                                 Text("Weekly mood trend")
-                                    .font(.headline)
+                                    .font(DS.Typography.heading())
                                 Spacer()
                                 if let last = entries.first?.date {
                                     Text("Updated \(last, style: .date)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(DS.Typography.caption())
+                                        .foregroundStyle(DS.Color.muted)
                                 }
                             }
 
@@ -51,17 +51,17 @@ struct InsightsView: View {
                                 }
                                 .chartYScale(domain: 1...5)
                                 .frame(height: 180)
-                                .padding(.top, 4)
+                                .padding(.top, DS.Spacing.xs)
 
-                                HStack {
-                                    LegendDot(color: .blue)
+                                  HStack {
+                                      LegendDot(color: DS.Color.accent)
                                     Text("1 = low, 5 = high")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(DS.Typography.caption())
+                                        .foregroundStyle(DS.Color.muted)
                                     Spacer()
                                     Text(avgMoodText)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .font(DS.Typography.caption())
+                                        .foregroundStyle(DS.Color.muted)
                                 }
                             }
                         }
@@ -69,9 +69,9 @@ struct InsightsView: View {
 
                     // This week summary
                     Card {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                             Text("This week at a glance")
-                                .font(.headline)
+                                .font(DS.Typography.heading())
 
                             if weekEntries.isEmpty {
                                 EmptyMini(text: "No entries yet this week.")
@@ -88,43 +88,43 @@ struct InsightsView: View {
 
                     // Streak & cadence
                     Card {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                             Text("Consistency")
-                                .font(.headline)
-                            HStack(spacing: 16) {
+                                .font(DS.Typography.heading())
+                            HStack(spacing: DS.Spacing.lg) {
                                 StatPill(title: "Current streak", value: "\(currentStreak) days")
                                 StatPill(title: "Days this month", value: "\(daysThisMonth) d")
                                 StatPill(title: "Avg per week", value: String(format: "%.1f", checksPerWeek))
                             }
-                            .padding(.top, 4)
+                            .padding(.top, DS.Spacing.xs)
                         }
                     }
 
                     // Anxiety range
                     Card {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                             Text("Anxiety range (last 30 days)")
-                                .font(.headline)
+                                .font(DS.Typography.heading())
                             if last30.isEmpty {
                                 EmptyMini(text: "Log a few entries to see a range.")
                             } else {
                                 let minA = last30.map(\.anxiety).min() ?? 0
                                 let maxA = last30.map(\.anxiety).max() ?? 0
                                 ProgressView(value: Double(maxA), total: 10)
-                                    .tint(.pink)
+                                    .tint(DS.Color.accent)
                                 HStack {
                                     Text("Min: \(minA)/10")
                                     Spacer()
                                     Text("Max: \(maxA)/10")
                                 }
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(DS.Typography.caption())
+                                .foregroundStyle(DS.Color.muted)
                             }
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                .padding(.horizontal, DS.Spacing.lg)
+                .padding(.bottom, DS.Spacing.xl)
             }
             .navigationTitle("Insights")
             .navigationBarTitleDisplayMode(.large)
@@ -138,12 +138,11 @@ private extension InsightsView {
     struct Card<Content: View>: View {
         @ViewBuilder var content: Content
         var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                content
+            SurfaceCard {
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    content
+                }
             }
-            .padding(16)
-            .background(.secondary.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
 
@@ -151,10 +150,10 @@ private extension InsightsView {
         let text: String
         var body: some View {
             Text(text)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(DS.Typography.body())
+                .foregroundStyle(DS.Color.muted)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 8)
+                .padding(.vertical, DS.Spacing.sm)
         }
     }
 
@@ -170,13 +169,12 @@ private extension InsightsView {
         let value: String
         var body: some View {
             VStack(alignment: .leading, spacing: 2) {
-                Text(value).font(.headline)
-                Text(title).font(.caption).foregroundStyle(.secondary)
+                Text(value).font(DS.Typography.heading())
+                Text(title).font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 12)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.vertical, DS.Spacing.md)
+            .padding(.horizontal, DS.Spacing.md)
+            .background(DS.Color.surface.opacity(0.18), in: RoundedRectangle(cornerRadius: DS.Radius.md))
         }
     }
 

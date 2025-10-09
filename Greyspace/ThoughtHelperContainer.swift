@@ -9,26 +9,39 @@ import SwiftUI
 
 struct ThoughtHelperContainer: View {
     @AppStorage("intro.skip.thoughtHelper") private var skipIntro = false
+    @AppStorage(AppLanguage.storageKey) private var appLanguageCode: String = AppLanguage.defaultCode
     @State private var localSkip = false
     @State private var showIntro = true
 
     var body: some View {
+        let language = AppLanguage.resolved(for: appLanguageCode)
+        let title = Localization.string("intro.thought.title", fallback: "Thought Helper", language: language)
+        let blurb = Localization.string(
+            "intro.thought.container.blurb",
+            fallback: "This space is for sticky, unhelpful thoughts; the kind that loop or weigh on you. We’ll gently walk through a few steps to find a kinder perspective. Not fixing, just softening.",
+            language: language
+        )
+        let points = [
+            Localization.string("intro.thought.point1", fallback: "Start with one real thought (not a question).", language: language),
+            Localization.string("intro.thought.point2", fallback: "Name the feeling it brings up.", language: language),
+            Localization.string("intro.thought.point3", fallback: "Pick a gentler way to see it or write your own (AI can help!).", language: language)
+        ]
+        let startLabel = Localization.string("intro.thought.start", fallback: "Let’s Start", language: language)
+
         Group {
             if showIntro && !skipIntro {
                 FeatureIntroView(
-                    title: "Thought Helper",
-                    blurb: "This space is for sticky, unhelpful thoughts; The kind that loop or weigh on you. We’ll gently walk through a few steps to find a kinder perspective. Not fixing, just softening.",
-                    points: [
-                        "Start with one real thought (not a question).",
-                        "Name the feeling it brings up.",
-                        "Pick a gentler way to see it or write your own (AI can help!)."
-                    ],
+                    title: title,
+                    blurb: blurb,
+                    points: points,
                     dontShowAgain: $localSkip,
-                    startLabel: "Let’s Start"
-                ) {
+                    startLabel: startLabel,
+                    onStart: {
                     if localSkip { skipIntro = true }
                     withAnimation { showIntro = false }
-                }
+                },
+                    language: language
+                )
             } else {
                 ThoughtBuilderWizard()
             }

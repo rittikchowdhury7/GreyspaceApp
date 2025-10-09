@@ -32,10 +32,10 @@ struct AddPressureSlipSheet: View {
                 Section("Softer take") {
                     TextEditor(text: $softer)
                         .frame(minHeight: 120)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(UIColor.separator)))
+                        .overlay(RoundedRectangle(cornerRadius: DS.Radius.sm).stroke(DS.Color.muted.opacity(0.3)))
                     
                     if let aiError {
-                        Text(aiError).font(.footnote).foregroundStyle(.red)
+                        Text(aiError).font(DS.Typography.caption()).foregroundStyle(DS.Color.danger)
                     }
                     
                     HStack {
@@ -43,7 +43,7 @@ struct AddPressureSlipSheet: View {
                             Task { await askAI() }
                         } label: {
                             if isLoadingAI {
-                                HStack(spacing: 8) { ProgressView(); Text("Asking AI…") }
+                                HStack(spacing: DS.Spacing.sm) { ProgressView(); Text("Asking AI…") }
                             } else {
                                 Label("Suggest with AI", systemImage: "sparkles")
                             }
@@ -53,22 +53,24 @@ struct AddPressureSlipSheet: View {
                         Spacer()
                         
                         if aiService != nil {
-                            HStack(spacing: 4) {
+                            HStack(spacing: DS.Spacing.xs) {
                                 Image(systemName: "sparkles").imageScale(.small)
-                                Text("AI").font(.caption2).fontWeight(.semibold)
+                                Text("AI").font(DS.Typography.caption()).fontWeight(.semibold)
                             }
-                            .padding(.horizontal, 8).padding(.vertical, 4)
-                            .background(Color.accentColor.opacity(0.12), in: Capsule())
-                            .overlay(Capsule().stroke(Color.accentColor.opacity(0.35), lineWidth: 1))
-                            .foregroundStyle(Color.accentColor)
+                            .padding(.horizontal, DS.Spacing.sm).padding(.vertical, DS.Spacing.xs)
+                            .background(DS.Color.accent.opacity(0.12), in: Capsule())
+                            .overlay(Capsule().stroke(DS.Color.accent.opacity(0.35), lineWidth: 1))
+                            .foregroundStyle(DS.Color.accent)
                         } else {
                             Text("No API key")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(DS.Typography.caption())
+                                .foregroundStyle(DS.Color.muted)
                         }
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.Color.background)
             .navigationTitle("New pressure")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

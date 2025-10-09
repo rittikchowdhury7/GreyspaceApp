@@ -29,6 +29,7 @@ struct TodayView: View {
     @State private var notes: String = ""
     @State private var didMindfulness: Bool = false
     @AppStorage("intro.skip.checkin") private var skipCheckInIntro = false
+    @AppStorage(AppLanguage.storageKey) private var appLanguageCode: String = AppLanguage.defaultCode
     @State private var showCheckInIntro = false
 
     // ✅ These should be local state, not @Binding
@@ -65,69 +66,83 @@ struct TodayView: View {
     // MARK: - HOME
 
     private var homeCard: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Logo / graphic
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(LinearGradient(colors: [.gray.opacity(0.15), .gray.opacity(0.05)],
-                                             startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(height: 180)
-                        .overlay(
-                            HStack(spacing: 16) {
-                                if let _ = UIImage(named: "GreyspaceLogo") {
-                                    Image("GreyspaceLogo")
-                                        .resizable().scaledToFit()
-                                        .frame(width: 96, height: 96)
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                                } else {
-                                    Image(systemName: "circle.lefthalf.filled")
-                                        .resizable().scaledToFit()
-                                        .frame(width: 96, height: 96)
-                                        .foregroundStyle(.secondary)
-                                }
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Greyspace").font(.title2).bold()
-                                    Text("Where your thoughts don’t have to be black or white.")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                                Spacer()
-                            }
-                            .padding()
-                        )
-                }
-
-                // Summary of last check-in
-                VStack(alignment: .leading, spacing: 8) {
-                    if let last = entries.first {
-                        Text("Last check-in")
-                            .font(.subheadline).foregroundStyle(.secondary)
-                        HStack {
-                            Text(last.date, style: .date)
-                            Text("•")
-                            Text(last.date, style: .time)
-                            Spacer()
-                            Text("Mood \(last.mood)/5 · A \(last.anxiety)/10")
-                                .font(.subheadline).foregroundStyle(.secondary)
+        let language = AppLanguage.resolved(for: appLanguageCode)
+        return ScrollView {
+            VStack(spacing: DS.Spacing.xl) {
+                SurfaceCard {
+                    HStack(spacing: DS.Spacing.lg) {
+                        if let _ = UIImage(named: "GreyspaceLogo") {
+                            Image("GreyspaceLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 96, height: 96)
+                                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
+                        } else {
+                            Image(systemName: "circle.lefthalf.filled")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 96, height: 96)
+                                .foregroundStyle(DS.Color.accent)
+                                .padding(DS.Spacing.sm)
+                                .background(
+                                    RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
+                                        .fill(DS.Color.accent.opacity(0.12))
+                                )
                         }
-                        if !last.gratitude.isEmpty {
-                            Text("Gratitude: " + last.gratitude.joined(separator: ", "))
-                                .font(.footnote).foregroundStyle(.secondary)
-                                .lineLimit(1)
-                        } else if !last.notes.isEmpty {
-                            Text("“\(last.notes)”")
-                                .font(.footnote).foregroundStyle(.secondary)
-                                .lineLimit(1)
+                        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                            Text("Greyspace")
+                                .font(DS.Typography.title())
+                                .foregroundStyle(DS.Color.onSurface)
+                            Text("Where your thoughts don’t have to be black or white.")
+                                .font(DS.Typography.body())
+                                .foregroundStyle(DS.Color.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                    } else {
-                        Text("No entries yet — a 60-second snapshot is a great first step.")
-                            .font(.subheadline).foregroundStyle(.secondary)
+                        Spacer()
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
+                .frame(maxWidth: 520, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, DS.Spacing.lg)
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                        if let last = entries.first {
+                            Text("Last check-in")
+                                .font(DS.Typography.body())
+                                .foregroundStyle(DS.Color.muted)
+
+                            HStack {
+                                Text(last.date, style: .date)
+                                Text("•")
+                                Text(last.date, style: .time)
+                                Spacer()
+                                Text("Mood \(last.mood)/5 · A \(last.anxiety)/10")
+                                    .font(DS.Typography.body())
+                                    .foregroundStyle(DS.Color.muted)
+                            }
+
+                            if !last.gratitude.isEmpty {
+                                let gratitudeList = last.gratitude.joined(separator: ", ")
+                                let format = Localization.string("today.last.gratitude", fallback: "Gratitude: %@", language: language)
+                                Text(String(format: format, gratitudeList))
+                                    .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
+                                    .lineLimit(1)
+                            } else if !last.notes.isEmpty {
+                                Text("“\(last.notes)”")
+                                    .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
+                                    .lineLimit(1)
+                            }
+                        } else {
+                            Text("No entries yet — a 60-second snapshot is a great first step.")
+                                .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxWidth: 520, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, DS.Spacing.lg)
 
                 // CTA
                 // In TodayView, replace your Start Check-In button with:
@@ -143,8 +158,8 @@ struct TodayView: View {
                     Text("Start Check-In")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .padding(.horizontal, 16)
+                .buttonStyle(PrimaryButtonStyle())
+                .padding(.horizontal, DS.Spacing.lg)
                 .sheet(isPresented: $showCheckInIntro) {
                     CheckInIntroSheet {
                         // onStart → actually begin the wizard
@@ -155,11 +170,11 @@ struct TodayView: View {
                 }
 
                 // Quick tools
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
                     Text("Quick tools")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                    let columns = [GridItem(.adaptive(minimum: 150, maximum: 220), spacing: 12)]
-                    LazyVGrid(columns: columns, spacing: 12) {
+                        .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+                    let columns = [GridItem(.adaptive(minimum: 150, maximum: 220), spacing: DS.Spacing.md)]
+                    LazyVGrid(columns: columns, spacing: DS.Spacing.md) {
                         NavigationLink { MindfulnessIntroContainer() } label: {
                             toolCard(title: "One-breath reset", icon: "wind")
                         }.buttonStyle(.plain)
@@ -172,53 +187,54 @@ struct TodayView: View {
                             toolCard(title: "Everyday Pressures", icon: "exclamationmark.bubble")
                         }.buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
 
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                         Text("This month")
-                            .font(.subheadline).foregroundStyle(.secondary)
+                            .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
                         JournalCalendarView(entries: entries)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, DS.Spacing.lg)
             }
-            .padding(.vertical, 20)
+            .padding(.vertical, DS.Spacing.xl)
         }
         .sheet(isPresented: $showCBT) { ThoughtHelperContainer() }
     }
 
     private func toolCard(title: String, icon: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Image(systemName: icon)
-                .imageScale(.large)
-                .foregroundStyle(.secondary)
-            Text(title)
-                .font(.headline)
-                .multilineTextAlignment(.leading)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-                .layoutPriority(1)
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                Image(systemName: icon)
+                    .imageScale(.large)
+                    .foregroundStyle(DS.Color.accent)
+                    .padding(DS.Spacing.xs)
+                    .background(
+                        RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                            .fill(DS.Color.accent.opacity(0.12))
+                    )
+                Text(title)
+                    .font(DS.Typography.heading())
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(minHeight: 110)
-        .background(.secondary.opacity(0.08))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(.quaternary, lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .contentShape(RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - WIZARD
 
     private var wizard: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: DS.Spacing.xl) {
                 StepHeader(title: "Today Check-In", step: step, total: totalSteps)
 
                 currentStepView
                     .animation(.easeInOut, value: step)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
             }
             .padding(.bottom, 120)
         }
@@ -228,19 +244,20 @@ struct TodayView: View {
                     if step == 1 { withAnimation { mode = .home } }
                     else { step -= 1 }
                 }
+                .buttonStyle(SecondaryButtonStyle())
                 .disabled(step == 1 && mode == .wizard)
 
                 Spacer()
 
                 if canSkipCurrentStep {
                     Button("Skip") { skipCurrentStep() }
-                        .foregroundStyle(.secondary)
+                        .buttonStyle(SecondaryButtonStyle())
                 }
 
                 Button(step == totalSteps ? "Save" : "Next") {
                     if step < totalSteps { step += 1 } else { saveEntry() }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(PrimaryButtonStyle())
             }
         }
         .scrollDismissesKeyboard(.interactively)
@@ -263,49 +280,49 @@ struct TodayView: View {
     // MARK: Steps
 
     private var moodStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Step 1 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("How’s your mood right now?").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 1 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("How’s your mood right now?").font(DS.Typography.heading()).bold()
             Picker("Mood", selection: $mood) {
                 ForEach(1...5, id: \.self) { Text("\($0)").tag($0) }
             }
             .pickerStyle(.segmented)
             Text("Pick a number that feels right in this moment.")
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
         }
     }
 
     private var anxietyStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Step 2 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("How much anxiety is present?").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 2 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("How much anxiety is present?").font(DS.Typography.heading()).bold()
             Slider(value: Binding(get: { Double(anxiety) }, set: { anxiety = Int($0) }),
                    in: 0...10, step: 1)
             HStack { Text("0"); Spacer(); Text("10") }
-                .font(.caption).foregroundStyle(.secondary)
-            Text("Current anxiety: \(anxiety) / 10").font(.headline)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
+            Text("Current anxiety: \(anxiety) / 10").font(DS.Typography.heading())
         }
     }
 
     private var gratitudeStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Step 3 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("One small thing that went right?").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 3 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("One small thing that went right?").font(DS.Typography.heading()).bold()
             ForEach(gratitude.indices, id: \.self) { idx in
                 TextField("I’m grateful for… (optional)", text: Binding(
                     get: { gratitude[idx] }, set: { gratitude[idx] = $0 }))
                 .textFieldStyle(.roundedBorder)
             }
             Text("You can leave these blank and tap Skip.")
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
         }
     }
 
     // ✅ New Photos step (local-only, using draft.photos: [ImageAttachment])
     private var photosStep: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
             Text("Add any photos that capture your day. They stay on your device.")
-                .font(.subheadline).foregroundStyle(.secondary)
+                .font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
 
             PhotosPicker(selection: $pickerItems,
                          maxSelectionCount: 6,
@@ -318,10 +335,10 @@ struct TodayView: View {
             }
 
             if draft.photos.isEmpty && justPickedThumbs.isEmpty {
-                Text("No photos yet").foregroundStyle(.secondary)
+                Text("No photos yet").foregroundStyle(DS.Color.muted)
             } else {
-                let columns = [GridItem(.adaptive(minimum: 90), spacing: 8)]
-                LazyVGrid(columns: columns, spacing: 8) {
+                let columns = [GridItem(.adaptive(minimum: 90), spacing: DS.Spacing.sm)]
+                LazyVGrid(columns: columns, spacing: DS.Spacing.sm) {
                     ForEach(draft.photos) { photo in
                         if let img = AttachmentStore.load(filename: photo.filename) {
                             Thumb(img: img) {
@@ -365,14 +382,14 @@ struct TodayView: View {
                     .scaledToFill()
                     .frame(width: 90, height: 90)
                     .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: DS.Radius.md))
 
                 if let onDelete {
                     Button(role: .destructive) { onDelete() } label: {
                         Image(systemName: "xmark.circle.fill")
                             .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(.white.opacity(0.95))
-                            .background(Circle().fill(Color.black.opacity(0.35)))
+                            .foregroundStyle(DS.Color.onSurface.opacity(0.95))
+                            .background(Circle().fill(DS.Color.background.opacity(0.35)))
                     }
                     .offset(x: -4, y: 4)
                 }
@@ -381,32 +398,32 @@ struct TodayView: View {
     }
 
     private var notesStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Step 5 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("Anything on your mind?").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 5 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("Anything on your mind?").font(DS.Typography.heading()).bold()
             TextEditor(text: $notes)
                 .frame(minHeight: 140)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(.quaternary))
+                .overlay(RoundedRectangle(cornerRadius: DS.Radius.md).stroke(DS.Color.muted.opacity(0.2)))
             Text("Optional. Jot a sentence, or Skip.")
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
         }
     }
 
     private var mindfulnessStep: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Step 6 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("One-breath reset (10 seconds)").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 6 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("One-breath reset (10 seconds)").font(DS.Typography.heading()).bold()
             BreathingCircle(active: $didMindfulness).frame(height: 220)
             Toggle("I did a breath", isOn: $didMindfulness)
             Text("Inhale as the circle expands. Exhale as it shrinks. Do 1–3 cycles.")
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
         }
     }
 
     private var reviewStep: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Step 6 of \(totalSteps)").font(.subheadline).foregroundStyle(.secondary)
-            Text("Review").font(.title3).bold()
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            Text("Step 6 of \(totalSteps)").font(DS.Typography.body()).foregroundStyle(DS.Color.muted)
+            Text("Review").font(DS.Typography.heading()).bold()
             SummaryRow(label: "Mood", value: "\(mood) / 5")
             SummaryRow(label: "Anxiety", value: "\(anxiety) / 10")
             if !cleanGratitude.isEmpty {
@@ -420,7 +437,7 @@ struct TodayView: View {
             }
             SummaryRow(label: "Mindfulness", value: didMindfulness ? "✓" : "—")
             Text("Tap **Save** to finish. If anxiety is high or mood low, we’ll offer a quick thought helper next.")
-                .font(.footnote).foregroundStyle(.secondary).padding(.top, 8)
+                .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted).padding(.top, DS.Spacing.sm)
         }
     }
 

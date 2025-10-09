@@ -19,7 +19,7 @@ struct SettingsView: View {
     @Query(sort: \PressureSlip.trigger) private var pressures: [PressureSlip]
 
     // Language
-    @AppStorage("AppLanguage") private var appLanguage: String = "system" // "system","en","hi","fil","zh-Hans"
+    @AppStorage(AppLanguage.storageKey) private var appLanguage: String = AppLanguage.defaultCode // "system","en","hi","fil","zh-Hans"
 
     // Intros (skip flags used across the app)
     @AppStorage("intro.skip.checkin")      private var skipCheckInIntro = false
@@ -43,24 +43,25 @@ struct SettingsView: View {
                 // MARK: – General
                 Section(header: Text("General")) {
                     Picker("Language", selection: $appLanguage) {
-                        ForEach(AppLanguage.all, id: \.code) { lang in
-                            Text(lang.display).tag(lang.code)
+                        ForEach(AppLanguage.all) { lang in
+                            Text(lang.localizedKey).tag(lang.code)
                         }
                     }
-                    .onChange(of: appLanguage) { _ in
-                        // If you support live switching, you can refresh views here.
-                        // Otherwise iOS will use per-app language in Settings.
+                    .onChange(of: appLanguage) { newValue in
+                        AppLanguage.applySelection(newValue)
+                        NotificationCenter.default.post(name: .appLanguageDidChange,
+                                                        object: AppLanguage.resolved(for: newValue))
                         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
 
                     Toggle("Haptics", isOn: $hapticsEnabled)
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                         Toggle("Share anonymous usage", isOn: $analyticsOptIn)
-                            .tint(.accentColor)
+                            .tint(DS.Color.accent)
 
                         Text("Helps improve Greyspace; never includes your notes or photos.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                            .font(DS.Typography.caption())
+                            .foregroundStyle(DS.Color.muted)
                     }
                 }
 
@@ -125,7 +126,7 @@ struct SettingsView: View {
                         Text("Version")
                         Spacer()
                         Text(appVersionString())
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DS.Color.muted)
                     }
                     Button {
                         // Replace with your App Store URL
@@ -141,6 +142,9 @@ struct SettingsView: View {
                     }
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(DS.Color.background)
             .navigationTitle("Settings")
             .confirmationDialog(
                 "Delete all local data?",
@@ -183,34 +187,56 @@ struct SettingsView: View {
 
     private func exportAllText() -> String {
         var lines: [String] = []
-        lines.append("— Greyspace Export —\n")
+        let language = Localization.currentLanguage()
+        lines.append(Localization.string("export.header", fallback: "— Greyspace Export —\n", language: language))
 
         // Journal entries
-        lines.append("== Check-Ins ==")
+        lines.append(Localization.string("export.section.checkins", fallback: "== Check-Ins ==", language: language))
         for e in entries {
-            lines.append("• \(e.date.formatted(date: .complete, time: .shortened))")
-            lines.append("  Mood \(e.mood)/5 | Anxiety \(e.anxiety)/10")
-            if !e.gratitude.isEmpty { lines.append("  Gratitude: " + e.gratitude.joined(separator: ", ")) }
-            if !e.notes.isEmpty { lines.append("  Notes: \(e.notes)") }
-            if e.didMindfulness { lines.append("  Mindfulness: ✓") }
-            if !e.photos.isEmpty { lines.append("  Photos: \(e.photos.count) (stored locally)") }
+            let dateLine = String(format: Localization.string("export.entry.date", fallback: "• %@", language: language), e.date.formatted(date: .complete, time: .shortened))
+            lines.append(dateLine)
+            let moodLine = String(format: Localization.string("export.entry.mood", fallback: "  Mood %d/5 | Anxiety %d/10", language: language), e.mood, e.anxiety)
+            lines.append(moodLine)
+            if !e.gratitude.isEmpty {
+                let value = e.gratitude.joined(separator: ", ")
+                let text = String(format: Localization.string("export.entry.gratitude", fallback: "  Gratitude: %@", language: language), value)
+                lines.append(text)
+            }
+            if !e.notes.isEmpty {
+                let text = String(format: Localization.string("export.entry.notes", fallback: "  Notes: %@", language: language), e.notes)
+                lines.append(text)
+            }
+            if e.didMindfulness {
+                lines.append(Localization.string("export.entry.mindfulness", fallback: "  Mindfulness: ✓", language: language))
+            }
+            if !e.photos.isEmpty {
+                let text = String(format: Localization.string("export.entry.photos", fallback: "  Photos: %d (stored locally)", language: language), e.photos.count)
+                lines.append(text)
+            }
             lines.append("")
         }
 
         // Thought records (reframes)
-        lines.append("== Reframes ==")
+        lines.append(Localization.string("export.section.reframes", fallback: "== Reframes ==", language: language))
         for r in thoughts {
-            lines.append("• \(r.date.formatted(date: .complete, time: .shortened))")
-            if !r.automaticThought.isEmpty { lines.append("  Original: \(r.automaticThought)") }
-            if !r.reframe.isEmpty { lines.append("  Kinder perspective: \(r.reframe)") }
+            let dateLine = String(format: Localization.string("export.reframe.date", fallback: "• %@", language: language), r.date.formatted(date: .complete, time: .shortened))
+            lines.append(dateLine)
+            if !r.automaticThought.isEmpty {
+                let text = String(format: Localization.string("export.reframe.original", fallback: "  Original: %@", language: language), r.automaticThought)
+                lines.append(text)
+            }
+            if !r.reframe.isEmpty {
+                let text = String(format: Localization.string("export.reframe.kinder", fallback: "  Kinder perspective: %@", language: language), r.reframe)
+                lines.append(text)
+            }
             lines.append("")
         }
 
         // Pressures
-        lines.append("== Everyday Pressures ==")
+        lines.append(Localization.string("export.section.pressures", fallback: "== Everyday Pressures ==", language: language))
         for p in pressures {
-            lines.append("• \(p.trigger)")
-            lines.append("  Softer take: \(p.slip)")
+            lines.append(String(format: Localization.string("export.pressure.trigger", fallback: "• %@", language: language), p.trigger))
+            lines.append(String(format: Localization.string("export.pressure.reframe", fallback: "  Softer take: %@", language: language), p.slip))
             lines.append("")
         }
 
@@ -230,17 +256,3 @@ struct SettingsView: View {
 }
 
 // MARK: – Language model
-
-struct AppLanguage: Identifiable, Hashable {
-    let id = UUID()
-    let code: String   // "system","en","hi","fil","zh-Hans"
-    let display: String
-
-    static let all: [AppLanguage] = [
-        AppLanguage(code: "system", display: "System"),
-        AppLanguage(code: "en",     display: "English"),
-        AppLanguage(code: "hi",     display: "Hindi"),
-        AppLanguage(code: "fil",    display: "Tagalog"),
-        AppLanguage(code: "zh-Hans",display: "Chinese (Simplified)")
-    ]
-}

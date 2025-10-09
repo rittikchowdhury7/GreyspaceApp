@@ -20,13 +20,13 @@ struct JournalPost: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.date, style: .date)
-                        .font(.subheadline).fontWeight(.semibold)
+                        .font(DS.Typography.body()).fontWeight(.semibold)
                     Text(entry.date, style: .time)
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(DS.Typography.caption()).foregroundStyle(DS.Color.muted)
                 }
                 Spacer(minLength: 8)
                 Text(moodEmoji(entry.mood))
-                    .font(.title3)
+                    .font(DS.Typography.heading())
                     .accessibilityHidden(true)
                 StatBadge(title: "Mood", value: "\(entry.mood)/5", color: moodColor(entry.mood))
                 StatBadge(title: "Anxiety", value: "\(entry.anxiety)/10", color: anxietyColor(entry.anxiety))
@@ -50,29 +50,30 @@ struct JournalPost: View {
                                 .tag(idx)
                         } else {
                             ZStack {
-                                Color.secondary.opacity(0.08)
+                                DS.Color.surface.opacity(0.12)
                                 Image(systemName: "photo")
                                     .imageScale(.large)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(DS.Color.muted)
                             }
                             .frame(height: 320)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.md))
                             .tag(idx)
                         }
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .automatic))
                 .frame(height: 320)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.md))
                 .overlay(
                     Group {
                         if entry.photos.count > 1 {
                             Text("\(selectedIndex + 1)/\(entry.photos.count)")
-                                .font(.caption2).monospacedDigit()
-                                .padding(.horizontal, 8).padding(.vertical, 4)
-                                .background(.black.opacity(0.45), in: Capsule())
-                                .foregroundStyle(.white)
-                                .padding(8)
+                                .font(DS.Typography.caption()).monospacedDigit()
+                                .padding(.horizontal, DS.Spacing.sm)
+                                .padding(.vertical, DS.Spacing.xs)
+                                .background(DS.Color.background.opacity(0.7), in: Capsule())
+                                .foregroundStyle(DS.Color.onSurface)
+                                .padding(DS.Spacing.sm)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                     },
@@ -83,29 +84,29 @@ struct JournalPost: View {
             // Caption (notes)
             if !entry.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text(entry.notes.trimmingCharacters(in: .whitespacesAndNewlines))
-                    .font(.body)
+                    .font(DS.Typography.body())
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             // Subtitle: gratitude + timestamp
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 if !entry.gratitude.isEmpty {
                     Text("Gratitude: " + entry.gratitude.joined(separator: ", "))
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .font(DS.Typography.caption())
+                        .foregroundStyle(DS.Color.muted)
                         .lineLimit(2)
                 }
                 Text(entry.date.formatted(date: .abbreviated, time: .shortened))
-                    .font(.footnote)
-                    .foregroundStyle(.tertiary)
+                    .font(DS.Typography.caption())
+                    .foregroundStyle(DS.Color.muted.opacity(0.7))
             }
 
-            Divider().opacity(0.2)
+            Divider().overlay(DS.Color.muted.opacity(0.2))
         }
-        .padding(12)
-        .background(.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(.quaternary, lineWidth: 1))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .padding(DS.Spacing.md)
+        .background(DS.Color.surface.opacity(0.18), in: RoundedRectangle(cornerRadius: DS.Radius.lg))
+        .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg).stroke(DS.Color.muted.opacity(0.25), lineWidth: 1))
+        .contentShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
     }
 }
 
@@ -113,19 +114,19 @@ struct JournalPost: View {
 
 private func moodColor(_ mood: Int) -> Color {
     switch mood {
-    case ...2: return .red.opacity(0.85)        // low
-    case 3:    return .orange.opacity(0.85)     // mid
-    case 4:    return .yellow.opacity(0.85)     // good
-    default:   return .green.opacity(0.85)      // great (5)
+    case ...2: return DS.Color.danger
+    case 3:    return DS.Color.warning
+    case 4:    return DS.Color.accent
+    default:   return DS.Color.success
     }
 }
 
 private func anxietyColor(_ a: Int) -> Color {
     switch a {
-    case 0...3:  return .green.opacity(0.85)
-    case 4...6:  return .yellow.opacity(0.9)
-    case 7...8:  return .orange.opacity(0.9)
-    default:     return .red.opacity(0.9)
+    case 0...3:  return DS.Color.success
+    case 4...6:  return DS.Color.warning
+    case 7...8:  return DS.Color.accent
+    default:     return DS.Color.danger
     }
 }
 
@@ -144,10 +145,10 @@ private struct StatBadge: View {
     let color: Color
     var body: some View {
         HStack(spacing: 6) {
-            Text(title).font(.caption2).bold().textCase(.uppercase)
-            Text(value).font(.caption).monospacedDigit()
+            Text(title).font(DS.Typography.caption()).bold().textCase(.uppercase)
+            Text(value).font(DS.Typography.caption()).monospacedDigit()
         }
-        .padding(.horizontal, 10).padding(.vertical, 6)
+        .padding(.horizontal, DS.Spacing.md).padding(.vertical, DS.Spacing.sm)
         .background(color.opacity(0.18), in: Capsule())
         .overlay(Capsule().stroke(color.opacity(0.55), lineWidth: 1))
         .foregroundStyle(color)

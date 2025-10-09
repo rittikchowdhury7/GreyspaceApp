@@ -16,52 +16,54 @@ struct FeatureIntroView: View {
     @Binding var dontShowAgain: Bool
     let startLabel: String
     let onStart: () -> Void
+    let language: AppLanguage
 
     var body: some View {
-        VStack(spacing: 24) {
+        let dontShowLabel = Localization.string("intro.toggle.dontShow", fallback: "Don’t show again", language: language)
+
+        VStack(spacing: DS.Spacing.xl) {
             Spacer(minLength: 12)
 
-            VStack(spacing: 12) {
-                Text(title).font(.largeTitle).bold().multilineTextAlignment(.center)
-                Text(blurb)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
+            VStack(spacing: DS.Spacing.md) {
+                Text(title)
+                    .font(DS.Typography.display())
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
+                Text(blurb)
+                    .font(DS.Typography.body())
+                    .foregroundStyle(DS.Color.muted)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, DS.Spacing.xl)
             }
 
             if !points.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                     ForEach(points, id: \.self) { p in
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.sm) {
                             Image(systemName: "dot.circle.fill").imageScale(.small)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(DS.Color.muted)
                             Text(p)
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
+                                .font(DS.Typography.body())
+                                .foregroundStyle(DS.Color.muted)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, DS.Spacing.xl)
             }
 
             Spacer()
 
-            Toggle("Don’t show again", isOn: $dontShowAgain)
-                .font(.callout)
-                .padding(.horizontal, 24)
+            Toggle(dontShowLabel, isOn: $dontShowAgain)
+                .font(DS.Typography.body())
+                .padding(.horizontal, DS.Spacing.xl)
 
             Button(action: onStart) {
                 Text(startLabel)
-                    .font(.headline)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 24)
             }
+            .buttonStyle(PrimaryButtonStyle())
+            .padding(.horizontal, DS.Spacing.xl)
             .accessibilityIdentifier("intro.start")
         }
     }

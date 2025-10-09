@@ -4,5 +4,16 @@
 <dict>
 	<key>OPENAI_API_KEY</key>
 	<string>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</string>
+        <key>UIAppFonts</key>
+        <array>
+                <string>OpenSans-ExtraBold.ttf</string>
+                <string>OpenSans-Bold.ttf</string>
+                <string>OpenSans-Black.ttf</string>
+                <string>OpenSans-SemiBold.ttf</string>
+                <string>OpenSans-Medium.ttf</string>
+                <string>OpenSans-Regular.ttf</string>
+                <string>OpenSans-Light.ttf</string>
+		<string>OpenSans-Thin.ttf</string>
+	</array>
 </dict>
 </plist>

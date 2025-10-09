@@ -20,10 +20,10 @@ struct JournalCalendarView: View {
     @State private var monthOffset: Int = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
             header
             weekdayHeader
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 8) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: DS.Spacing.xs), count: 7), spacing: DS.Spacing.sm) {
                 ForEach(days, id: \.self) { day in
                     if let day {
                         dayCell(day)
@@ -33,9 +33,9 @@ struct JournalCalendarView: View {
                 }
             }
         }
-        .padding(12)
-        .background(.secondary.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(DS.Spacing.md)
+        .background(DS.Color.surface.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg))
     }
 
     // MARK: - Header (month, prev/next)
@@ -48,7 +48,7 @@ struct JournalCalendarView: View {
             Spacer()
 
             Text(monthTitle)
-                .font(.headline)
+                .font(DS.Typography.heading())
 
             Spacer()
 
@@ -64,8 +64,8 @@ struct JournalCalendarView: View {
         return HStack {
             ForEach(symbols, id: \.self) { s in
                 Text(s)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(DS.Typography.caption())
+                    .foregroundStyle(DS.Color.muted)
                     .frame(maxWidth: .infinity)
             }
         }
@@ -80,9 +80,9 @@ struct JournalCalendarView: View {
 
         return VStack(spacing: 2) {
             Text("\(calendar.component(.day, from: date))")
-                .font(.footnote)
+                .font(DS.Typography.caption())
                 .fontWeight(isToday ? .semibold : .regular)
-                .foregroundStyle(inThisMonth ? .primary : .secondary)
+                .foregroundStyle(inThisMonth ? DS.Color.onSurface : DS.Color.muted)
 
             if checked {
                 Image(systemName: "checkmark.circle.fill")
@@ -93,14 +93,14 @@ struct JournalCalendarView: View {
                     .frame(width: 12, height: 12)
                     .overlay(
                         Circle()
-                            .stroke(.quaternary, lineWidth: 1)
+                            .stroke(DS.Color.muted.opacity(0.2), lineWidth: 1)
                             .opacity(isToday ? 1 : 0) // subtle ring for today when no checkin
                     )
             }
         }
         .frame(height: 36)
         .frame(maxWidth: .infinity)
-        .padding(4)
+        .padding(DS.Spacing.xs)
         .background(
             Circle()
                 .fill(.primary.opacity(0)) // transparent
