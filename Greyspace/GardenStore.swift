@@ -89,13 +89,13 @@ final class GardenStoreUserDefaults: GardenStorage {
 // MARK: - GardenStore
 
 @MainActor
-public final class GardenStore: ObservableObject {
-    @Published public private(set) var state: GardenState
+final class GardenStore: ObservableObject {
+    @Published private(set) var state: GardenState
 
     private let storage: GardenStorage
     private let calendar: Calendar
 
-    public init(
+    init(
         storage: GardenStorage,
         initialState: GardenState? = nil,
         calendar: Calendar = .current
@@ -105,7 +105,7 @@ public final class GardenStore: ObservableObject {
         self.state = initialState ?? storage.loadState()
     }
 
-    public static func makeDefault() -> GardenStore {
+    static func makeDefault() -> GardenStore {
         #if canImport(SwiftData)
         if #available(iOS 17, *) {
             return GardenStore(storage: GardenStoreSwiftData())
@@ -116,30 +116,30 @@ public final class GardenStore: ObservableObject {
 
     // MARK: - Onboarding
 
-    public func markOnboardingCompleted() {
+    func markOnboardingCompleted() {
         state.hasCompletedOnboarding = true
         persist()
     }
 
-    public func resetOnboarding() {
+    func resetOnboarding() {
         state.hasCompletedOnboarding = false
         persist()
     }
 
     // MARK: - Plant Lifecycle
 
-    public func startRun(with plant: PlantChoice) {
+    func startRun(with plant: PlantChoice) {
         state.activeRun = PlantRun(plant: plant, startDate: Date())
         persist()
     }
 
-    public func abandonRun() {
+    func abandonRun() {
         state.activeRun = nil
         persist()
     }
 
     @discardableResult
-    public func recordDailyProgress(
+    func recordDailyProgress(
         action: GrowthActionType,
         on date: Date = Date()
     ) -> PlantRun? {
@@ -183,7 +183,7 @@ public final class GardenStore: ObservableObject {
         persist()
     }
 
-    public func enableNurtureModeForActiveRun() {
+    func enableNurtureModeForActiveRun() {
         guard var run = state.activeRun else { return }
         run.nurtureModeEnabled = true
         state.activeRun = run
@@ -193,12 +193,12 @@ public final class GardenStore: ObservableObject {
         persist()
     }
 
-    public func updateProfile(_ update: (inout GardenProfile) -> Void) {
+    func updateProfile(_ update: (inout GardenProfile) -> Void) {
         update(&state.profile)
         persist()
     }
 
-    public func resetRainDayIfNeeded(on date: Date = Date()) {
+    func resetRainDayIfNeeded(on date: Date = Date()) {
         let weekOfYear = calendar.component(.weekOfYear, from: date)
         if state.flags.lastRainWeekOfYear != weekOfYear {
             state.flags.rainDaysRemainingThisWeek = 1
@@ -207,7 +207,7 @@ public final class GardenStore: ObservableObject {
         }
     }
 
-    public func useRainDayIfAvailable(on date: Date = Date()) -> Bool {
+    func useRainDayIfAvailable(on date: Date = Date()) -> Bool {
         resetRainDayIfNeeded(on: date)
         guard state.flags.rainDaysRemainingThisWeek > 0 else { return false }
         state.flags.rainDaysRemainingThisWeek -= 1
@@ -215,7 +215,7 @@ public final class GardenStore: ObservableObject {
         return true
     }
 
-    public func refreshWeeklyBlossomIfNeeded(for run: PlantRun, on date: Date = Date()) -> PlantRun {
+    func refreshWeeklyBlossomIfNeeded(for run: PlantRun, on date: Date = Date()) -> PlantRun {
         var mutableRun = run
         let entriesThisWeek = run.completedEntries.filter { entry in
             calendar.isDate(entry.date, equalTo: date, toGranularity: .weekOfYear)
@@ -224,7 +224,7 @@ public final class GardenStore: ObservableObject {
         return mutableRun
     }
 
-    public func startNewSeed(with plant: PlantChoice) {
+    func startNewSeed(with plant: PlantChoice) {
         startRun(with: plant)
     }
 
@@ -237,12 +237,12 @@ public final class GardenStore: ObservableObject {
 
 // MARK: - Plant Library
 
-public protocol GrowWithMeProgressHandling {
+protocol GrowWithMeProgressHandling {
     func growWithMeDidComplete(action: GrowthActionType, at date: Date)
 }
 
 extension GardenStore: GrowWithMeProgressHandling {
-    public func growWithMeDidComplete(action: GrowthActionType, at date: Date) {
+    func growWithMeDidComplete(action: GrowthActionType, at date: Date) {
         _ = recordDailyProgress(action: action, on: date)
     }
 }
