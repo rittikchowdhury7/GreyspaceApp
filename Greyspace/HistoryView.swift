@@ -22,6 +22,7 @@ struct HistoryView: View {
     @State private var kind: Kind = .entries
     @State private var query: String = ""
     @State private var sortNewestFirst: Bool = true
+    let showSettings: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -47,6 +48,16 @@ struct HistoryView: View {
                 }
             }
             .navigationTitle("History")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel(Text(String(localized: "Settings")))
+                }
+            }
         }
     }
 

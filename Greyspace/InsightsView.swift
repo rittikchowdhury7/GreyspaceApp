@@ -14,6 +14,7 @@ struct InsightsView: View {
     @Environment(\.calendar) private var calendar
     @Query(sort: \JournalEntry.date, order: .reverse, animation: .default)
     private var entries: [JournalEntry]
+    let showSettings: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -128,6 +129,16 @@ struct InsightsView: View {
             }
             .navigationTitle("Insights")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel(Text(String(localized: "Settings")))
+                }
+            }
         }
     }
 }

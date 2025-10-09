@@ -14,6 +14,7 @@ struct TodayView: View {
     @ObservedObject var gardenStore: GardenStore
     @Environment(\.modelContext) private var context
     @Binding var selectedTab: RootView.Tab
+    let showSettings: () -> Void
 
     // Mode: home card vs. wizard
     enum Mode { case home, wizard }
@@ -52,6 +53,16 @@ struct TodayView: View {
             }
             .navigationTitle("Today")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel(Text(String(localized: "Settings")))
+                }
+            }
             .onChange(of: selectedTab) { newValue in
                 if newValue == .today {
                     withAnimation { resetToHome() }
@@ -268,10 +279,19 @@ struct TodayView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, DS.Spacing.lg)
             }
-            .padding(.bottom, 120)
+            .padding(.bottom, DS.Spacing.xl * 3)
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
+        .scrollDismissesKeyboard(.interactively)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .safeAreaInset(edge: .bottom) { wizardControls }
+    }
+
+    private var wizardControls: some View {
+        VStack(spacing: 0) {
+            Divider()
+                .background(DS.Color.surface.opacity(0.4))
+
+            HStack(spacing: DS.Spacing.md) {
                 Button("Back") {
                     if step == 1 { withAnimation { mode = .home } }
                     else { step -= 1 }
@@ -291,9 +311,11 @@ struct TodayView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.vertical, DS.Spacing.md)
+            .background(DS.Color.surface.opacity(0.98).ignoresSafeArea(edges: .bottom))
         }
-        .scrollDismissesKeyboard(.interactively)
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 
     @ViewBuilder

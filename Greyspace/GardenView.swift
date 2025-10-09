@@ -4,6 +4,7 @@ struct GardenView: View {
     @ObservedObject var store: GardenStore
     @State private var selection: Tab = .inProgress
     @State private var showCompletionCard: Bool = false
+    let showSettings: () -> Void
 
     enum Tab: String, CaseIterable, Identifiable {
         case inProgress
@@ -40,6 +41,16 @@ struct GardenView: View {
                 tabContent
             }
             .navigationTitle(String(localized: "Garden"))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel(Text(String(localized: "Settings")))
+                }
+            }
         }
         .sheet(isPresented: $showCompletionCard) {
             CompletionCard(store: store, isPresented: $showCompletionCard)
@@ -298,6 +309,6 @@ private struct CompletionCard: View {
 
 struct GardenView_Previews: PreviewProvider {
     static var previews: some View {
-        GardenView(store: GardenStore.makeDefault())
+        GardenView(store: GardenStore.makeDefault(), showSettings: {})
     }
 }
