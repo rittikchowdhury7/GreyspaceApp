@@ -61,7 +61,7 @@ public enum PlantStage: Int, CaseIterable, Codable, Identifiable {
 
 // MARK: - PlantChoice
 
-public struct PlantChoice: Identifiable, Codable, Equatable {
+public struct PlantChoice: Identifiable, Codable, Equatable, Hashable {
     public let id: String
     public let displayName: String
     public let symbolism: String
