@@ -27,11 +27,36 @@ final class GardenStoreSwiftData: GardenStorage {
         }
     }
 
-    init(container: ModelContainer = {
-        let schema = Schema([GardenStateModel.self])
-        return try! ModelContainer(for: schema)
-    }()) {
+    init(container: ModelContainer) {
         self.container = container
+    }
+
+    static func makeDefaultContainer() throws -> ModelContainer {
+        let schema = Schema([GardenStateModel.self])
+        let url = try storeURL()
+        let configuration = ModelConfiguration(url: url)
+        return try ModelContainer(for: schema, configurations: configuration)
+    }
+
+    static func make() -> GardenStoreSwiftData? {
+        do {
+            return try GardenStoreSwiftData(container: makeDefaultContainer())
+        } catch {
+            #if DEBUG
+            print("Failed to create GardenStoreSwiftData container:", error)
+            #endif
+            return nil
+        }
+    }
+
+    private static func storeURL() throws -> URL {
+        let base = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        return base.appendingPathComponent("GrowWithMe.store")
     }
 
     func loadState() -> GardenState {
@@ -156,7 +181,9 @@ final class GardenStore: ObservableObject {
     static func makeDefault() -> GardenStore {
         #if canImport(SwiftData)
         if #available(iOS 17, *) {
-            return GardenStore(storage: GardenStoreSwiftData())
+            if let store = GardenStoreSwiftData.make() {
+                return GardenStore(storage: store)
+            }
         }
         #endif
         return GardenStore(storage: GardenStoreUserDefaults())
