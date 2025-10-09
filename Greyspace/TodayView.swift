@@ -14,6 +14,7 @@ struct TodayView: View {
     @ObservedObject var gardenStore: GardenStore
     @Environment(\.modelContext) private var context
     @Binding var selectedTab: RootView.Tab
+    @Binding var isTabBarHidden: Bool
     let showSettings: () -> Void
 
     // Mode: home card vs. wizard
@@ -74,15 +75,22 @@ struct TodayView: View {
                 NotificationService.scheduleDaily(reminder: .evening, id: "reminder.evening")
             }
         }
-        .onAppear { evaluateGrowthOnboarding() }
+        .onAppear {
+            evaluateGrowthOnboarding()
+            isTabBarHidden = (mode == .wizard)
+        }
         .onChange(of: gardenStore.state.hasCompletedOnboarding) { _ in
             evaluateGrowthOnboarding()
+        }
+        .onChange(of: mode) { newValue in
+            isTabBarHidden = (newValue == .wizard)
         }
         .fullScreenCover(isPresented: $showGrowthOnboarding) {
             GrowthOnboardingFlow(store: gardenStore) {
                 dismissGrowthOnboardingAndStartCheckIn()
             }
         }
+        .onDisappear { isTabBarHidden = false }
     }
 
     // MARK: - HOME
@@ -523,6 +531,7 @@ struct TodayView: View {
 
     private func resetToHome() {
         mode = .home
+        isTabBarHidden = false
         step = 1
         mood = 3
         anxiety = 3

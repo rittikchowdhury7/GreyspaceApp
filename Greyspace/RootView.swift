@@ -19,6 +19,7 @@ struct RootView: View {
     @StateObject private var gardenStore = GardenStore.makeDefault()
     @State private var selected: Tab = .today
     @State private var showingSettings = false
+    @State private var isTabBarHidden = false
 
     private let tabs: [TabItem] = TabItem.all
 
@@ -27,7 +28,9 @@ struct RootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(DS.Color.background.ignoresSafeArea())
             .safeAreaInset(edge: .bottom) {
-                CustomTabBar(selected: $selected, tabs: tabs)
+                if !isTabBarHidden {
+                    CustomTabBar(selected: $selected, tabs: tabs)
+                }
             }
             .sheet(isPresented: $showingSettings) {
                 NavigationStack {
@@ -44,6 +47,7 @@ struct RootView: View {
         case .today:
             TodayView(gardenStore: gardenStore,
                       selectedTab: $selected,
+                      isTabBarHidden: $isTabBarHidden,
                       showSettings: { showingSettings = true })
         case .history:
             HistoryView(showSettings: { showingSettings = true })

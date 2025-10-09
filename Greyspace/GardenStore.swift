@@ -70,10 +70,50 @@ final class GardenStoreUserDefaults: GardenStorage {
     }
 
     func loadState() -> GardenState {
-        guard let data = defaults.data(forKey: Keys.state) else {
-            return GardenState()
+        let decoder = JSONDecoder()
+        if let data = defaults.data(forKey: Keys.state),
+           let state = try? decoder.decode(GardenState.self, from: data) {
+            return state
         }
-        return (try? JSONDecoder().decode(GardenState.self, from: data)) ?? GardenState()
+
+        var state = GardenState()
+        var didLoadLegacy = false
+
+        if defaults.object(forKey: LegacyKeys.hasCompletedOnboarding) != nil {
+            state.hasCompletedOnboarding = defaults.bool(forKey: LegacyKeys.hasCompletedOnboarding)
+            didLoadLegacy = true
+        }
+
+        if let data = defaults.data(forKey: LegacyKeys.activeRun),
+           let run = try? decoder.decode(PlantRun.self, from: data) {
+            state.activeRun = run
+            didLoadLegacy = true
+        }
+
+        if let data = defaults.data(forKey: LegacyKeys.completedRuns),
+           let runs = try? decoder.decode([PlantRun].self, from: data) {
+            state.completedRuns = runs
+            didLoadLegacy = true
+        }
+
+        if let data = defaults.data(forKey: LegacyKeys.profile),
+           let profile = try? decoder.decode(GardenProfile.self, from: data) {
+            state.profile = profile
+            didLoadLegacy = true
+        }
+
+        if let data = defaults.data(forKey: LegacyKeys.flags),
+           let flags = try? decoder.decode(GardenFlags.self, from: data) {
+            state.flags = flags
+            didLoadLegacy = true
+        }
+
+        if didLoadLegacy {
+            save(state: state)
+            return state
+        }
+
+        return GardenState()
     }
 
     func save(state: GardenState) {
@@ -83,6 +123,14 @@ final class GardenStoreUserDefaults: GardenStorage {
 
     private enum Keys {
         static let state = "garden.state"
+    }
+
+    private enum LegacyKeys {
+        static let hasCompletedOnboarding = "garden.hasCompletedOnboarding"
+        static let activeRun = "garden.activeRun"
+        static let completedRuns = "garden.completedRuns"
+        static let profile = "garden.profile"
+        static let flags = "garden.flags"
     }
 }
 
