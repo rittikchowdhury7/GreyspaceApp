@@ -35,10 +35,12 @@
 // Tab bar
 "tab.today" = "今日";
 "tab.history" = "历史";
+"tab.garden" = "花园";
 "tab.insights" = "洞察";
 "tab.support" = "支持";
 "tab.today.accessibility" = "切换到“今日”标签";
 "tab.history.accessibility" = "切换到“历史”标签";
+"tab.garden.accessibility" = "切换到“花园”标签";
 "tab.insights.accessibility" = "切换到“洞察”标签";
 "tab.support.accessibility" = "切换到“支持”标签";
 

@@ -12,6 +12,7 @@ import LocalAuthentication
 import SwiftData
 
 struct SettingsView: View {
+    @ObservedObject var gardenStore: GardenStore
     @Environment(\.openURL) private var openURL
     @Environment(\.modelContext) private var context
     @Query(sort: \JournalEntry.date, order: .reverse) private var entries: [JournalEntry]
@@ -64,6 +65,8 @@ struct SettingsView: View {
                             .foregroundStyle(DS.Color.muted)
                     }
                 }
+
+                GrowthSettingsSection(store: gardenStore)
 
                 // MARK: – Privacy & Security
                 Section(header: Text("Privacy & Security"),

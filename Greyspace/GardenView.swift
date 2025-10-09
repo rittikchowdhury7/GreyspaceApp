@@ -27,16 +27,19 @@ struct GardenView: View {
     private var activeRun: PlantRun? { store.state.activeRun }
 
     var body: some View {
-        VStack {
-            Picker("", selection: $selection) {
-                ForEach(Tab.allCases) { tab in
-                    Text(tab.title).tag(tab)
+        NavigationStack {
+            VStack {
+                Picker("", selection: $selection) {
+                    ForEach(Tab.allCases) { tab in
+                        Text(tab.title).tag(tab)
+                    }
                 }
-            }
-            .pickerStyle(.segmented)
-            .padding()
+                .pickerStyle(.segmented)
+                .padding()
 
-            tabContent
+                tabContent
+            }
+            .navigationTitle(String(localized: "Garden"))
         }
         .sheet(isPresented: $showCompletionCard) {
             CompletionCard(store: store, isPresented: $showCompletionCard)
@@ -53,7 +56,6 @@ struct GardenView: View {
                 showCompletionCard = true
             }
         }
-        .navigationTitle(String(localized: "Garden"))
     }
 
     private var tabContent: some View {

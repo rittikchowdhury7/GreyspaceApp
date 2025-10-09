@@ -12,10 +12,12 @@ struct RootView: View {
     enum Tab: Hashable, CaseIterable {
         case today
         case history
+        case garden
         case insights
         case support
     }
 
+    @StateObject private var gardenStore = GardenStore.makeDefault()
     @State private var selected: Tab = .today
 
     private let tabs: [TabItem] = TabItem.all
@@ -33,13 +35,15 @@ struct RootView: View {
     private func content(for tab: Tab) -> some View {
         switch tab {
         case .today:
-            TodayView(selectedTab: $selected)
+            TodayView(gardenStore: gardenStore, selectedTab: $selected)
         case .history:
             HistoryView()
+        case .garden:
+            GardenView(store: gardenStore)
         case .insights:
             InsightsView()
         case .support:
-            SettingsView()
+            SettingsView(gardenStore: gardenStore)
         }
     }
 }
@@ -55,6 +59,7 @@ private struct TabItem: Identifiable {
     static let all: [TabItem] = [
         TabItem(tab: .today, icon: "sun.max.fill", titleKey: "tab.today", accessibilityKey: "tab.today.accessibility"),
         TabItem(tab: .history, icon: "clock.arrow.circlepath", titleKey: "tab.history", accessibilityKey: "tab.history.accessibility"),
+        TabItem(tab: .garden, icon: "leaf.fill", titleKey: "tab.garden", accessibilityKey: "tab.garden.accessibility"),
         TabItem(tab: .insights, icon: "chart.line.uptrend.xyaxis", titleKey: "tab.insights", accessibilityKey: "tab.insights.accessibility"),
         TabItem(tab: .support, icon: "heart.fill", titleKey: "tab.support", accessibilityKey: "tab.support.accessibility")
     ]

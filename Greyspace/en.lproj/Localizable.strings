@@ -36,10 +36,12 @@
 // Tab bar
 "tab.today" = "Today";
 "tab.history" = "History";
+"tab.garden" = "Garden";
 "tab.insights" = "Insights";
 "tab.support" = "Support";
 "tab.today.accessibility" = "Switch to Today tab";
 "tab.history.accessibility" = "Switch to History tab";
+"tab.garden.accessibility" = "Switch to Garden tab";
 "tab.insights.accessibility" = "Switch to Insights tab";
 "tab.support.accessibility" = "Switch to Support tab";
 
