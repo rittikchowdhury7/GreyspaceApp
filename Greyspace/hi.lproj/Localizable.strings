@@ -32,6 +32,16 @@
 "Export as text" = "टेक्स्ट के रूप में निर्यात करें";
 "Feature Intros" = "फ़ीचर परिचय";
 
+// Tab bar
+"tab.today" = "आज";
+"tab.history" = "इतिहास";
+"tab.insights" = "अंतर्दृष्टि";
+"tab.support" = "सहायता";
+"tab.today.accessibility" = "आज टैब पर जाएँ";
+"tab.history.accessibility" = "इतिहास टैब पर जाएँ";
+"tab.insights.accessibility" = "अंतर्दृष्टि टैब पर जाएँ";
+"tab.support.accessibility" = "सहायता टैब पर जाएँ";
+
 // Intro screens
 "intro.checkin.title" = "दैनिक चेक-इन";
 "intro.checkin.blurb" = "अपने मूड, तनाव, कृतज्ञता और नोट्स का 60-सेकंड का स्नैपशॉट लें। यदि चाहें तो फ़ोटो जोड़ें। यह निजी है और सिर्फ़ आपके डिवाइस में सुरक्षित रहता है।";

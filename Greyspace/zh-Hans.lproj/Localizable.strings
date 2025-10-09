@@ -32,6 +32,16 @@
 "Export as text" = "导出为文本";
 "Feature Intros" = "功能介绍";
 
+// Tab bar
+"tab.today" = "今日";
+"tab.history" = "历史";
+"tab.insights" = "洞察";
+"tab.support" = "支持";
+"tab.today.accessibility" = "切换到“今日”标签";
+"tab.history.accessibility" = "切换到“历史”标签";
+"tab.insights.accessibility" = "切换到“洞察”标签";
+"tab.support.accessibility" = "切换到“支持”标签";
+
 // Intro screens
 "intro.checkin.title" = "每日签到";
 "intro.checkin.blurb" = "用60秒记录你的情绪、压力、感恩和笔记。想的话可以添加照片。内容仅保存在你的设备上。";

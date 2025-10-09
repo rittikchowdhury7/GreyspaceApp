@@ -33,6 +33,16 @@
 "Export as text" = "Export as text";
 "Feature Intros" = "Feature Intros";
 
+// Tab bar
+"tab.today" = "Today";
+"tab.history" = "History";
+"tab.insights" = "Insights";
+"tab.support" = "Support";
+"tab.today.accessibility" = "Switch to Today tab";
+"tab.history.accessibility" = "Switch to History tab";
+"tab.insights.accessibility" = "Switch to Insights tab";
+"tab.support.accessibility" = "Switch to Support tab";
+
 // Intro screens
 "intro.checkin.title" = "Daily Check-In";
 "intro.checkin.blurb" = "Take a 60-second snapshot of your mood, stress, gratitude, and notes. Add photos if you like. It’s private, stored only on your device.";
