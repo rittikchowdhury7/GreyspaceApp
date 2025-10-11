@@ -35,10 +35,12 @@
 // Tab bar
 "tab.today" = "Ngayon";
 "tab.history" = "Kasaysayan";
+"tab.garden" = "Hardin";
 "tab.insights" = "Mga Insight";
 "tab.support" = "Suporta";
 "tab.today.accessibility" = "Lumipat sa tab na Ngayon";
 "tab.history.accessibility" = "Lumipat sa tab na Kasaysayan";
+"tab.garden.accessibility" = "Lumipat sa tab na Hardin";
 "tab.insights.accessibility" = "Lumipat sa tab na Mga Insight";
 "tab.support.accessibility" = "Lumipat sa tab na Suporta";
 

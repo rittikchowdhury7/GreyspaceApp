@@ -11,8 +11,11 @@ import SwiftData
 import PhotosUI
 
 struct TodayView: View {
+    @ObservedObject var gardenStore: GardenStore
     @Environment(\.modelContext) private var context
     @Binding var selectedTab: RootView.Tab
+    @Binding var isTabBarHidden: Bool
+    let showSettings: () -> Void
 
     // Mode: home card vs. wizard
     enum Mode { case home, wizard }
@@ -42,6 +45,7 @@ struct TodayView: View {
     var entries: [JournalEntry]
 
     @State private var showCBT = false
+    @State private var showGrowthOnboarding = false
 
     var body: some View {
         NavigationStack {
@@ -50,6 +54,16 @@ struct TodayView: View {
             }
             .navigationTitle("Today")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings()
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                    }
+                    .accessibilityLabel(Text(String(localized: "Settings")))
+                }
+            }
             .onChange(of: selectedTab) { newValue in
                 if newValue == .today {
                     withAnimation { resetToHome() }
@@ -61,6 +75,22 @@ struct TodayView: View {
                 NotificationService.scheduleDaily(reminder: .evening, id: "reminder.evening")
             }
         }
+        .onAppear {
+            evaluateGrowthOnboarding()
+            isTabBarHidden = (mode == .wizard)
+        }
+        .onChange(of: gardenStore.state.hasCompletedOnboarding) { _ in
+            evaluateGrowthOnboarding()
+        }
+        .onChange(of: mode) { newValue in
+            isTabBarHidden = (newValue == .wizard)
+        }
+        .fullScreenCover(isPresented: $showGrowthOnboarding) {
+            GrowthOnboardingFlow(store: gardenStore) {
+                dismissGrowthOnboardingAndStartCheckIn()
+            }
+        }
+        .onDisappear { isTabBarHidden = false }
     }
 
     // MARK: - HOME
@@ -69,6 +99,11 @@ struct TodayView: View {
         let language = AppLanguage.resolved(for: appLanguageCode)
         return ScrollView {
             VStack(spacing: DS.Spacing.xl) {
+                if gardenStore.state.activeRun != nil, !gardenStore.state.profile.hidePlantOnHome {
+                    HomePlantWidget(store: gardenStore)
+                        .padding(.horizontal, DS.Spacing.lg)
+                }
+
                 SurfaceCard {
                     HStack(spacing: DS.Spacing.lg) {
                         if let _ = UIImage(named: "GreyspaceLogo") {
@@ -147,13 +182,7 @@ struct TodayView: View {
                 // CTA
                 // In TodayView, replace your Start Check-In button with:
                 Button {
-                    if skipCheckInIntro {
-                        // jump straight to wizard
-                        draft = JournalEntry()
-                        withAnimation { mode = .wizard }
-                    } else {
-                        showCheckInIntro = true
-                    }
+                    startCheckInFlow()
                 } label: {
                     Text("Start Check-In")
                         .frame(maxWidth: .infinity)
@@ -162,10 +191,7 @@ struct TodayView: View {
                 .padding(.horizontal, DS.Spacing.lg)
                 .sheet(isPresented: $showCheckInIntro) {
                     CheckInIntroSheet {
-                        // onStart → actually begin the wizard
-                        draft = JournalEntry()
-                        withAnimation { mode = .wizard }
-                        showCheckInIntro = false
+                        beginWizardFlow()
                     }
                 }
 
@@ -224,6 +250,31 @@ struct TodayView: View {
         }
     }
 
+    private func evaluateGrowthOnboarding() {
+        showGrowthOnboarding = !gardenStore.state.hasCompletedOnboarding
+    }
+
+    private func dismissGrowthOnboardingAndStartCheckIn() {
+        showGrowthOnboarding = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            startCheckInFlow()
+        }
+    }
+
+    private func startCheckInFlow() {
+        if skipCheckInIntro {
+            beginWizardFlow()
+        } else {
+            showCheckInIntro = true
+        }
+    }
+
+    private func beginWizardFlow() {
+        draft = JournalEntry()
+        withAnimation { mode = .wizard }
+        showCheckInIntro = false
+    }
+
     // MARK: - WIZARD
 
     private var wizard: some View {
@@ -236,10 +287,19 @@ struct TodayView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, DS.Spacing.lg)
             }
-            .padding(.bottom, 120)
+            .padding(.bottom, DS.Spacing.xl * 3)
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
+        .scrollDismissesKeyboard(.interactively)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .safeAreaInset(edge: .bottom) { wizardControls }
+    }
+
+    private var wizardControls: some View {
+        VStack(spacing: 0) {
+            Divider()
+                .background(DS.Color.surface.opacity(0.4))
+
+            HStack(spacing: DS.Spacing.md) {
                 Button("Back") {
                     if step == 1 { withAnimation { mode = .home } }
                     else { step -= 1 }
@@ -259,9 +319,11 @@ struct TodayView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.vertical, DS.Spacing.md)
+            .background(DS.Color.surface.opacity(0.98).ignoresSafeArea(edges: .bottom))
         }
-        .scrollDismissesKeyboard(.interactively)
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 
     @ViewBuilder
@@ -469,6 +531,7 @@ struct TodayView: View {
 
     private func resetToHome() {
         mode = .home
+        isTabBarHidden = false
         step = 1
         mood = 3
         anxiety = 3
@@ -493,6 +556,8 @@ struct TodayView: View {
         )
         context.insert(entry)
         do { try context.save() } catch { print("Save error: \(error)") }
+
+        gardenStore.growWithMeDidComplete(action: .checkIn, at: .now)
 
         let decision = PromptEngine.decide(mood: mood, anxiety: anxiety)
         if decision.shouldSuggestCBT { showCBT = true }

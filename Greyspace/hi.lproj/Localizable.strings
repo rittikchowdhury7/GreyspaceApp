@@ -35,10 +35,12 @@
 // Tab bar
 "tab.today" = "आज";
 "tab.history" = "इतिहास";
+"tab.garden" = "बगीचा";
 "tab.insights" = "अंतर्दृष्टि";
 "tab.support" = "सहायता";
 "tab.today.accessibility" = "आज टैब पर जाएँ";
 "tab.history.accessibility" = "इतिहास टैब पर जाएँ";
+"tab.garden.accessibility" = "बगीचा टैब पर जाएँ";
 "tab.insights.accessibility" = "अंतर्दृष्टि टैब पर जाएँ";
 "tab.support.accessibility" = "सहायता टैब पर जाएँ";
 
